@@ -79,6 +79,11 @@ model Report {
   aiGeneratedAt       DateTime?
   aiInputTokens       Int?
   aiOutputTokens      Int?
+  reportType          String    @default("basic")
+  driverNumber        Int?
+  conductorNumber     Int?
+  missingNumberCount  Int?
+  loShuFactsJson      String?
   createdAt           DateTime  @default(now())
   client              Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
