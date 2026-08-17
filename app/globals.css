@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+* { border-color: rgba(212, 175, 55, .14); }
+html { scroll-behavior: smooth; }
+body { background: #080914; color: #f6f1e7; }
+::selection { background: #d4af37; color: #080914; }
+::-webkit-scrollbar { width: 9px; }
+::-webkit-scrollbar-track { background: #080914; }
+::-webkit-scrollbar-thumb { background: #3e3a62; border-radius: 99px; }
+
+@layer utilities {
+  .bg-cosmic-field { background: radial-gradient(65% 55% at 8% 0%, rgba(201,125,74,.11), transparent 62%), radial-gradient(65% 60% at 95% 8%, rgba(212,175,55,.08), transparent 60%), radial-gradient(100% 80% at 50% 100%, rgba(27,29,58,.9), transparent 65%), linear-gradient(180deg, #080914 0%, #11142a 55%, #1b1d3a 100%); }
+  .glass { background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.02)); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(212,175,55,.24); }
+  .text-balance { text-wrap: balance; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+}

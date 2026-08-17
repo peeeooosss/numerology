@@ -1,0 +1,15 @@
+node_modules/
+.next/
+.env
+.env.local
+prisma/*.db
+prisma/*.db-journal
+public/reports/*.pdf
+
+# Local tool output
+*.log
+*.tsbuildinfo
+.vercel-token
+
+# Local Netlify folder
+.netlify
