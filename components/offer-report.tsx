@@ -46,24 +46,23 @@ export function OfferReport() {
 
         {/* Copy */}
         <div className="order-1 md:order-2">
-          <p className="mb-3 text-xs uppercase tracking-[.2em] text-gold">Start here</p>
-          <h2 className="font-display text-3xl font-semibold leading-tight text-cream md:text-4xl">
-            Your personal report, decoded from your birth date.
-          </h2>
-          <p className="mt-4 leading-relaxed text-lav">
-             A personalised PDF built from your exact date of birth and full name — blending
-            Western Pythagorean and Vedic Chaldean numerology for the most accurate reading possible.
+           <p className="mb-3 text-xs uppercase tracking-[.2em] text-gold">Your personalized ₹99 report</p>
+           <h2 className="font-display text-3xl font-semibold leading-tight text-cream md:text-4xl">
+             Understand the numbers that shape your story.
+           </h2>
+           <p className="mt-4 leading-relaxed text-lav">
+             A personalized report built from your name and exact date of birth. Explore your numerical patterns through a clear, structured analysis designed to help you understand yourself and your direction.
           </p>
 
           <ul className="mt-8 space-y-4">
             {[
-              "Life Path, Expression, Soul Urge & Personality numbers decoded",
-              "12-month monthly forecast with energy levels and best dates",
-              "Lucky numbers, aligned colours and Vedic gemstone guidance",
-              "Personalised do's & don'ts rooted in your core vibration",
-              "Affirmations written specifically for your Life Path number",
-              "Vedic Driver & Conductor numbers decoded",
-              "One major Lo Shu strength revealed, with your complete map teased",
+               "Personality, career and business tendencies",
+               "Money, prosperity and relationship patterns",
+               "Strengths, challenges and areas requiring balance",
+               "Lo Shu Grid with presence, absence and repetition of numbers",
+               "Driver and Conductor numbers explained",
+               "Important numbers that may hold personal significance",
+               "Practical insights into your life direction",
             ].map((item) => (
               <li key={item} className="flex items-start gap-3 text-sm text-lav">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-gold" />

@@ -98,7 +98,7 @@ export function ReportPurchaseModal({ trigger }: { trigger?: React.ReactNode }) 
           amount: orderData.amount,
           currency: orderData.currency,
           order_id: orderData.orderId,
-          name: "Vinod Numerology",
+          name: "ProsperPath Numerology",
           description: "Personal Numerology Report",
           prefill: { name: form.name, email: form.email, contact: form.phone },
           theme: { color: "#D4AF37" },
