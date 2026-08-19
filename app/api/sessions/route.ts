@@ -27,7 +27,10 @@ export async function GET(req: NextRequest) {
   const email = req.nextUrl.searchParams.get("email")?.trim().toLowerCase();
   if (!email) return NextResponse.json({ success: false, error: "Email is required" }, { status: 400 });
 
-  const client = await db.client.findFirst({ where: { coachId, email } });
+  const client = await db.client.findFirst({
+    where: { coachId, email },
+    include: { reports: { orderBy: { createdAt: "desc" }, select: { id: true, reportStatus: true, generatedAt: true } } },
+  });
   if (!client) return NextResponse.json({ success: true, sessions: [], summary: { total: 0, upcoming: 0, completed: 0, cancelled: 0 } });
 
   const sessions = await db.session.findMany({
@@ -38,7 +41,7 @@ export async function GET(req: NextRequest) {
   const upcoming = sessions.filter((session) => session.status === "booked").length;
   return NextResponse.json({
     success: true,
-    client: { id: client.id, name: client.name, email: client.email },
+    client: { id: client.id, name: client.name, email: client.email, reports: client.reports },
     sessions,
     summary: {
       total: sessions.length,

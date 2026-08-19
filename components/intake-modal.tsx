@@ -5,6 +5,7 @@ import { CalendarCheck, CheckCircle2, Loader2, LockKeyhole, X } from "lucide-rea
 import { Button } from "@/components/ui/button";
 import { SessionIntakeFields } from "@/components/session-intake-fields";
 import { formatDateOfBirth, initialSessionIntake, type SessionIntakeValues } from "@/lib/session-intake";
+import { useModal } from "@/lib/use-modal";
 
 type BookingState = "form" | "processing" | "confirmed" | "error";
 
@@ -20,6 +21,7 @@ export function IntakeModal() {
   const [error, setError] = useState("");
   const [result, setResult] = useState<BookingResult | null>(null);
   const [form, setForm] = useState<SessionIntakeValues>(initialSessionIntake);
+  useModal(open, () => setOpen(false));
 
   function openModal() {
     setState("form");
@@ -87,9 +89,10 @@ export function IntakeModal() {
       </Button>
 
       {open && (
-        <div role="dialog" aria-modal="true" aria-labelledby="intake-title" className="fixed inset-0 z-50 flex items-center justify-center bg-midnight/85 p-4 backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false); }}>
-          <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-gold/30 bg-[#14162d] p-6 shadow-cardglow md:p-8">
-            <button type="button" onClick={() => setOpen(false)} aria-label="Close form" className="absolute right-4 top-4 rounded-lg p-2 text-lav hover:bg-white/10 hover:text-cream"><X className="h-4 w-4" /></button>
+        <div role="dialog" aria-modal="true" aria-labelledby="intake-title" className="modal-safe-padding fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-midnight/85 backdrop-blur-sm sm:items-center" onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false); }}>
+          <div className="relative my-auto max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto overscroll-contain rounded-2xl border border-gold/30 bg-[#14162d] p-5 shadow-cardglow sm:p-6 md:max-h-[90vh] md:p-8">
+            <h2 id="intake-title" className="sr-only">Numerology consultation booking</h2>
+            <button type="button" onClick={() => setOpen(false)} aria-label="Close form" className="absolute right-3 top-3 inline-flex h-11 w-11 items-center justify-center rounded-lg text-lav focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold hover:bg-white/10 hover:text-cream"><X className="h-4 w-4" /></button>
 
             {state === "confirmed" && result ? (
               <div className="py-10 text-center">
@@ -108,7 +111,7 @@ export function IntakeModal() {
             ) : (
               <>
                 <p className="text-xs uppercase tracking-[.2em] text-gold">Test booking checkout</p>
-                <h3 id="intake-title" className="mt-2 font-display text-2xl text-cream">Tell us about you</h3>
+                 <h3 className="mt-2 font-display text-2xl text-cream">Tell us about you</h3>
                  <p className="mt-2 text-sm text-lav">This test flow creates a ₹999 mock order and records your 15-minute Numerology session.</p>
                 {error && <p role="alert" className="mt-4 rounded-lg border border-rose-400/30 bg-rose-400/10 p-3 text-sm text-rose-200">{error}</p>}
                 <form className="mt-6" onSubmit={submitBooking}>

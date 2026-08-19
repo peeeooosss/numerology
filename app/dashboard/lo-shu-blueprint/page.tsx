@@ -45,12 +45,12 @@ export default function LoShuBlueprintPage() {
   }, []);
 
   if (status === "loading") {
-    return <main className="flex min-h-screen items-center justify-center bg-cosmic-field text-lav">Preparing your private blueprint…</main>;
+    return <main className="flex min-h-screen-dynamic items-center justify-center bg-cosmic-field text-lav">Preparing your private blueprint…</main>;
   }
 
   if (status !== "ready" || !blueprint) {
     return (
-      <main className="min-h-screen bg-cosmic-field px-5 py-12 text-cream sm:px-8">
+        <main className="min-h-screen-dynamic bg-cosmic-field px-5 py-12 text-cream sm:px-8">
         <div className="mx-auto max-w-xl rounded-2xl border border-gold/20 bg-[#13162c] p-8 text-center shadow-cardglow">
           <LockKeyhole className="mx-auto h-12 w-12 text-gold" />
           <p className="mt-5 text-xs uppercase tracking-[.2em] text-gold">Full Lo Shu Blueprint</p>
@@ -70,7 +70,7 @@ export default function LoShuBlueprintPage() {
   }
 
   return (
-    <main className="min-h-screen bg-cosmic-field px-5 py-10 text-cream sm:px-8 lg:py-14">
+    <main className="min-h-screen-dynamic bg-cosmic-field px-5 py-10 text-cream sm:px-8 lg:py-14">
       <div className="mx-auto max-w-5xl">
         <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm text-lav hover:text-gold"><ArrowLeft className="h-4 w-4" /> Dashboard</Link>
         <div className="mt-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -90,7 +90,7 @@ export default function LoShuBlueprintPage() {
                 <div key={digit} className="flex min-h-24 flex-col items-center justify-center rounded-xl border border-gold/20 bg-[#0d0f20]">
                   <span className="font-display text-3xl text-gold">{digit}</span>
                   <span className="mt-1 text-sm tracking-[.15em] text-cream">{"• ".repeat(blueprint.counts[String(digit)] || 0).trim() || "—"}</span>
-                  <span className="mt-1 text-[10px] text-lav">{blueprint.counts[String(digit)] || 0} present</span>
+                   <span className="mt-1 text-xs text-lav">{blueprint.counts[String(digit)] || 0} present</span>
                 </div>
               ))}
             </div>

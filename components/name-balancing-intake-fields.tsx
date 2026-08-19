@@ -23,7 +23,7 @@ export function NameBalancingIntakeFields({ form, updateField, idPrefix = "name-
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <Label htmlFor={`${idPrefix}-birth-name`}>Full name at birth</Label>
-          <Input id={`${idPrefix}-birth-name`} required value={form.fullBirthName} onChange={(event) => updateField("fullBirthName", event.target.value)} placeholder="As on birth certificate" />
+          <Input id={`${idPrefix}-birth-name`} autoFocus required value={form.fullBirthName} onChange={(event) => updateField("fullBirthName", event.target.value)} placeholder="As on birth certificate" />
         </div>
         <div>
           <Label htmlFor={`${idPrefix}-current-name`}>Current name used daily</Label>
@@ -34,11 +34,11 @@ export function NameBalancingIntakeFields({ form, updateField, idPrefix = "name-
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <Label htmlFor={`${idPrefix}-dob`}>Exact date of birth</Label>
-          <Input id={`${idPrefix}-dob`} required type="date" value={form.dob} onChange={(event) => updateField("dob", event.target.value)} />
+          <Input id={`${idPrefix}-dob`} required type="date" min="1900-01-01" max={new Date().toISOString().slice(0, 10)} value={form.dob} onChange={(event) => updateField("dob", event.target.value)} />
         </div>
         <div>
           <Label htmlFor={`${idPrefix}-type`}>Name type</Label>
-          <select id={`${idPrefix}-type`} required value={form.nameType} onChange={(event) => updateField("nameType", event.target.value)} className="w-full rounded-xl border border-white/10 bg-[#0d0f20] px-3 py-2 text-sm text-cream focus:border-gold/40 focus:outline-none">
+          <select id={`${idPrefix}-type`} required value={form.nameType} onChange={(event) => updateField("nameType", event.target.value)} className="min-h-12 w-full rounded-xl border border-white/10 bg-[#0d0f20] px-3 py-2 text-base text-cream focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/20">
             {nameTypes.map((type) => <option key={type}>{type}</option>)}
           </select>
         </div>
@@ -57,17 +57,17 @@ export function NameBalancingIntakeFields({ form, updateField, idPrefix = "name-
 
       <div>
         <Label htmlFor={`${idPrefix}-usage`}>Where is this name used?</Label>
-        <textarea id={`${idPrefix}-usage`} required rows={2} value={form.usageContext} onChange={(event) => updateField("usageContext", event.target.value)} placeholder="Legal documents, workplace, business, email, social media, signature..." className="w-full rounded-xl border border-white/10 bg-[#0d0f20] px-3 py-2 text-sm text-cream placeholder-lav/50 focus:border-gold/40 focus:outline-none" />
+          <textarea id={`${idPrefix}-usage`} required rows={2} value={form.usageContext} onChange={(event) => updateField("usageContext", event.target.value)} placeholder="Legal documents, workplace, business, email, social media, signature..." className="min-h-20 w-full rounded-xl border border-white/10 bg-[#0d0f20] px-3 py-3 text-base text-cream placeholder:text-lav/70 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/20" />
       </div>
 
       <div>
         <Label htmlFor={`${idPrefix}-concern`}>Why are you considering Name Balancing?</Label>
-        <textarea id={`${idPrefix}-concern`} required rows={3} value={form.nameConcern} onChange={(event) => updateField("nameConcern", event.target.value)} placeholder="Describe the decision, concern, or transition you want help with." className="w-full rounded-xl border border-white/10 bg-[#0d0f20] px-3 py-2 text-sm text-cream placeholder-lav/50 focus:border-gold/40 focus:outline-none" />
+          <textarea id={`${idPrefix}-concern`} required rows={3} value={form.nameConcern} onChange={(event) => updateField("nameConcern", event.target.value)} placeholder="Describe the decision, concern, or transition you want help with." className="min-h-24 w-full rounded-xl border border-white/10 bg-[#0d0f20] px-3 py-3 text-base text-cream placeholder:text-lav/70 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/20" />
       </div>
 
       <div>
         <Label htmlFor={`${idPrefix}-candidates`}>Candidate names or spellings</Label>
-        <textarea id={`${idPrefix}-candidates`} rows={3} value={form.candidateNames} onChange={(event) => updateField("candidateNames", event.target.value)} placeholder="Enter up to five options, one per line. Leave blank if you want the Master to suggest options." className="w-full rounded-xl border border-white/10 bg-[#0d0f20] px-3 py-2 text-sm text-cream placeholder-lav/50 focus:border-gold/40 focus:outline-none" />
+          <textarea id={`${idPrefix}-candidates`} rows={3} value={form.candidateNames} onChange={(event) => updateField("candidateNames", event.target.value)} placeholder="Enter up to five options, one per line. Leave blank if you want the Master to suggest options." className="min-h-24 w-full rounded-xl border border-white/10 bg-[#0d0f20] px-3 py-3 text-base text-cream placeholder:text-lav/70 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/20" />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -77,7 +77,7 @@ export function NameBalancingIntakeFields({ form, updateField, idPrefix = "name-
         </div>
         <div>
           <Label htmlFor={`${idPrefix}-legal`}>Can the name change legally?</Label>
-          <select id={`${idPrefix}-legal`} value={form.legalChange} onChange={(event) => updateField("legalChange", event.target.value)} className="w-full rounded-xl border border-white/10 bg-[#0d0f20] px-3 py-2 text-sm text-cream focus:border-gold/40 focus:outline-none">
+          <select id={`${idPrefix}-legal`} value={form.legalChange} onChange={(event) => updateField("legalChange", event.target.value)} className="min-h-12 w-full rounded-xl border border-white/10 bg-[#0d0f20] px-3 py-2 text-base text-cream focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/20">
             <option value="">Not sure</option><option value="yes">Yes</option><option value="no">No, only daily/professional use</option>
           </select>
         </div>
@@ -85,18 +85,18 @@ export function NameBalancingIntakeFields({ form, updateField, idPrefix = "name-
 
       <div>
         <Label htmlFor={`${idPrefix}-constraints`}>Practical constraints</Label>
-        <textarea id={`${idPrefix}-constraints`} rows={2} value={form.nameConstraints} onChange={(event) => updateField("nameConstraints", event.target.value)} placeholder="Pronunciation, cultural meaning, syllables, domain availability, letters to avoid..." className="w-full rounded-xl border border-white/10 bg-[#0d0f20] px-3 py-2 text-sm text-cream placeholder-lav/50 focus:border-gold/40 focus:outline-none" />
+          <textarea id={`${idPrefix}-constraints`} rows={2} value={form.nameConstraints} onChange={(event) => updateField("nameConstraints", event.target.value)} placeholder="Pronunciation, cultural meaning, syllables, domain availability, letters to avoid..." className="min-h-20 w-full rounded-xl border border-white/10 bg-[#0d0f20] px-3 py-3 text-base text-cream placeholder:text-lav/70 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/20" />
       </div>
 
       <div>
         <Label htmlFor={`${idPrefix}-outcome`}>What decision would make this useful?</Label>
-        <textarea id={`${idPrefix}-outcome`} required rows={2} value={form.desiredOutcome} onChange={(event) => updateField("desiredOutcome", event.target.value)} placeholder="For example: choose between two spellings or understand whether a professional name fits my goals." className="w-full rounded-xl border border-white/10 bg-[#0d0f20] px-3 py-2 text-sm text-cream placeholder-lav/50 focus:border-gold/40 focus:outline-none" />
+          <textarea id={`${idPrefix}-outcome`} required rows={2} value={form.desiredOutcome} onChange={(event) => updateField("desiredOutcome", event.target.value)} placeholder="For example: choose between two spellings or understand whether a professional name fits my goals." className="min-h-20 w-full rounded-xl border border-white/10 bg-[#0d0f20] px-3 py-3 text-base text-cream placeholder:text-lav/70 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/20" />
       </div>
 
       {showPreferredTime && (
         <div>
           <Label htmlFor={`${idPrefix}-time`}>Preferred time (optional)</Label>
-          <Input id={`${idPrefix}-time`} type="datetime-local" value={form.scheduledAt} onChange={(event) => updateField("scheduledAt", event.target.value)} />
+          <Input id={`${idPrefix}-time`} type="datetime-local" step="900" value={form.scheduledAt} onChange={(event) => updateField("scheduledAt", event.target.value)} />
         </div>
       )}
     </div>

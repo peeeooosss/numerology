@@ -13,6 +13,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { formatDateOfBirth } from "@/lib/session-intake";
+import { useModal } from "@/lib/use-modal";
 
 type Step = "form" | "paying" | "generating" | "done" | "error";
 
@@ -31,6 +33,7 @@ export function ReportPurchaseModal({ trigger }: { trigger?: React.ReactNode }) 
   const [step, setStep] = useState<Step>("form");
   const [error, setError] = useState("");
   const [result, setResult] = useState<ReportResult | null>(null);
+  useModal(open, () => setOpen(false));
 
   // Form state
   const [form, setForm] = useState({
@@ -65,13 +68,7 @@ export function ReportPurchaseModal({ trigger }: { trigger?: React.ReactNode }) 
     e.preventDefault();
     setError("");
 
-    const dobFormatted = form.dob
-      ? new Date(form.dob).toLocaleDateString("en-IN", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        })
-      : "";
+    const dobFormatted = formatDateOfBirth(form.dob);
 
     if (!dobFormatted) {
       setError("Please enter a valid date of birth.");
@@ -197,17 +194,18 @@ export function ReportPurchaseModal({ trigger }: { trigger?: React.ReactNode }) 
           role="dialog"
           aria-modal="true"
           aria-labelledby="report-modal-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-midnight/85 p-4 backdrop-blur-sm"
+          className="modal-safe-padding fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-midnight/85 backdrop-blur-sm sm:items-center"
           onMouseDown={(e) => {
             if (e.target === e.currentTarget) setOpen(false);
           }}
         >
-          <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-gold/30 bg-[#14162d] p-6 shadow-cardglow md:p-8">
+          <div className="relative my-auto max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto overscroll-contain rounded-2xl border border-gold/30 bg-[#14162d] p-5 shadow-cardglow sm:p-6 md:max-h-[90vh] md:p-8">
+            <h2 id="report-modal-title" className="sr-only">Personalized numerology report purchase</h2>
             {/* Close */}
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="absolute right-4 top-4 rounded-lg p-2 text-lav hover:bg-white/10 hover:text-cream"
+              className="absolute right-3 top-3 inline-flex h-11 w-11 items-center justify-center rounded-lg text-lav focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold hover:bg-white/10 hover:text-cream"
               aria-label="Close"
             >
               <X className="h-4 w-4" />
@@ -222,7 +220,7 @@ export function ReportPurchaseModal({ trigger }: { trigger?: React.ReactNode }) 
                   </div>
                   <div>
                     <p className="text-xs uppercase tracking-[.2em] text-gold">Personal Report</p>
-                    <h3 id="report-modal-title" className="font-display text-xl text-cream">
+                    <h3 className="font-display text-xl text-cream">
                       Your numerology decoded — ₹99
                     </h3>
                   </div>
@@ -244,7 +242,8 @@ export function ReportPurchaseModal({ trigger }: { trigger?: React.ReactNode }) 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <Label htmlFor="rp-name">Your name (as called daily)</Label>
-                      <Input
+                        <Input
+                          autoFocus
                         id="rp-name"
                         required
                         placeholder="Aarav Mehta"
@@ -266,10 +265,12 @@ export function ReportPurchaseModal({ trigger }: { trigger?: React.ReactNode }) 
 
                   <div>
                     <Label htmlFor="rp-dob">Exact date of birth</Label>
-                    <Input
-                      id="rp-dob"
-                      required
-                      type="date"
+                        <Input
+                          id="rp-dob"
+                          required
+                          type="date"
+                          min="1900-01-01"
+                          max={new Date().toISOString().slice(0, 10)}
                       value={form.dob}
                       onChange={(e) => setForm((f) => ({ ...f, dob: e.target.value }))}
                     />
@@ -314,7 +315,7 @@ export function ReportPurchaseModal({ trigger }: { trigger?: React.ReactNode }) 
                       id="rp-focus"
                       value={form.focusArea}
                       onChange={(e) => setForm((f) => ({ ...f, focusArea: e.target.value }))}
-                      className="w-full rounded-xl border border-white/10 bg-[#0d0f20] px-3 py-2 text-sm text-cream focus:border-gold/40 focus:outline-none"
+                      className="min-h-12 w-full rounded-xl border border-white/10 bg-[#0d0f20] px-3 py-2 text-base text-cream focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/20"
                     >
                       {focusAreas.map((area) => (
                         <option key={area} value={area}>
@@ -332,7 +333,7 @@ export function ReportPurchaseModal({ trigger }: { trigger?: React.ReactNode }) 
                       placeholder="e.g. Should I change careers this year?"
                       value={form.question}
                       onChange={(e) => setForm((f) => ({ ...f, question: e.target.value }))}
-                      className="w-full rounded-xl border border-white/10 bg-[#0d0f20] px-3 py-2 text-sm text-cream placeholder-lav/50 focus:border-gold/40 focus:outline-none"
+                      className="min-h-12 w-full rounded-xl border border-white/10 bg-[#0d0f20] px-3 py-2 text-base text-cream placeholder:text-lav/70 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/20"
                     />
                   </div>
 
@@ -390,19 +391,19 @@ export function ReportPurchaseModal({ trigger }: { trigger?: React.ReactNode }) 
                 </p>
 
                 <div className="my-6 rounded-xl border border-gold/25 bg-gold/5 px-6 py-4">
-                  <p className="text-xs uppercase tracking-widest text-gold">Vedic Core</p>
+                  <p className="text-sm uppercase tracking-widest text-gold">Vedic Core</p>
                   <div className="mt-2 flex justify-center gap-8">
                     <div>
-                      <p className="text-xs text-lav">Driver</p>
+                      <p className="text-sm text-lav">Driver</p>
                       <p className="font-display text-4xl text-gold">{result.driver}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-lav">Conductor</p>
+                      <p className="text-sm text-lav">Conductor</p>
                       <p className="font-display text-4xl text-gold">{result.conductor}</p>
                     </div>
                   </div>
                   <p className="mt-2 text-sm text-lav">Plus your {result.lifePathTitle} reading</p>
-                  <p className="mt-3 text-xs text-lav">
+                  <p className="mt-3 text-sm text-lav">
                     Personal Year {result.personalYear} ·{" "}
                     <span className="text-goldlite">Report ID: {result.reportId.slice(-8)}</span>
                   </p>

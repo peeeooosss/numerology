@@ -67,7 +67,7 @@ export function saveSessions(sessions: PortalSession[]) {
 }
 
 export function nextSlots(slots: AvailabilitySlot[], limit = 3) {
-  const dayIndex = new Date().getDay();
-  const mondayFirst = dayIndex === 0 ? 6 : dayIndex - 1;
+  const today = new Intl.DateTimeFormat("en-IN", { weekday: "long", timeZone: "Asia/Kolkata" }).format(new Date()) as Weekday;
+  const mondayFirst = weekdays.indexOf(today);
   return [...slots].sort((a, b) => (weekdays.indexOf(a.day) - mondayFirst + 7) % 7 - ((weekdays.indexOf(b.day) - mondayFirst + 7) % 7) || a.start.localeCompare(b.start)).slice(0, limit);
 }

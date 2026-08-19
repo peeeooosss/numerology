@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { ClipboardEvent, FormEvent, KeyboardEvent, useState } from "react";
 import { ArrowLeft, KeyRound, LockKeyhole, Mail, ShieldCheck, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -39,9 +39,36 @@ export default function LoginPage() {
   }
 
   function updateCode(index: number, value: string) {
-    const digit = value.replace(/\D/g, "").slice(-1);
-    setCode((current) => current.map((item, itemIndex) => (itemIndex === index ? digit : item)));
-    if (digit && index < 5) document.getElementById(`otp-${index + 1}`)?.focus();
+    const digits = value.replace(/\D/g, "");
+    if (!digits) {
+      setCode((current) => current.map((item, itemIndex) => (itemIndex === index ? "" : item)));
+      return;
+    }
+
+    setCode((current) => {
+      const next = [...current];
+      digits.slice(0, 6 - index).split("").forEach((digit, offset) => { next[index + offset] = digit; });
+      return next;
+    });
+    const nextIndex = Math.min(index + digits.length, 5);
+    window.setTimeout(() => document.getElementById(`otp-${nextIndex}`)?.focus(), 0);
+  }
+
+  function handleCodeKeyDown(index: number, event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Backspace" && !code[index] && index > 0) {
+      event.preventDefault();
+      setCode((current) => current.map((item, itemIndex) => (itemIndex === index - 1 ? "" : item)));
+      document.getElementById(`otp-${index - 1}`)?.focus();
+    }
+    if (event.key === "ArrowLeft" && index > 0) document.getElementById(`otp-${index - 1}`)?.focus();
+    if (event.key === "ArrowRight" && index < 5) document.getElementById(`otp-${index + 1}`)?.focus();
+  }
+
+  function handleCodePaste(index: number, event: ClipboardEvent<HTMLInputElement>) {
+    const pasted = event.clipboardData.getData("text").replace(/\D/g, "");
+    if (!pasted) return;
+    event.preventDefault();
+    updateCode(index, pasted);
   }
 
   function verifyCode(event: FormEvent<HTMLFormElement>) {
@@ -58,7 +85,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-cosmic-field px-5 py-10 text-cream">
+    <main className="relative flex min-h-screen-dynamic items-center justify-center overflow-hidden bg-cosmic-field px-5 py-10 text-cream">
       <div className="pointer-events-none absolute -right-20 top-10 h-72 w-72 rounded-full bg-gold/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-copper/10 blur-3xl" />
       <Card className="relative w-full max-w-md border-gold/25 bg-[#101225]/90 p-2">
@@ -93,15 +120,15 @@ export default function LoginPage() {
                 <p className="mt-1 text-gold">{DEMO_USER_EMAIL}</p>
                 <p className="mt-2 text-xs text-lav">OTP: <span className="font-mono text-cream">123456</span></p>
               </div>
-              <div className="flex justify-center gap-2">
-                {code.map((digit, index) => (
-                  <input key={index} id={`otp-${index}`} aria-label={`Verification digit ${index + 1}`} inputMode="numeric" autoComplete={index === 0 ? "one-time-code" : "off"} value={digit} onChange={(event) => updateCode(index, event.target.value)} className="h-12 w-10 rounded-lg border border-gold/25 bg-midnight text-center text-lg text-cream outline-none focus:border-gold sm:w-11" />
-                ))}
-              </div>
+               <div className="mx-auto flex w-full max-w-sm justify-center gap-2">
+                 {code.map((digit, index) => (
+                   <input key={index} id={`otp-${index}`} aria-label={`Verification digit ${index + 1}`} inputMode="numeric" pattern="[0-9]*" maxLength={1} autoFocus={index === 0} autoComplete={index === 0 ? "one-time-code" : "off"} value={digit} onChange={(event) => updateCode(index, event.target.value)} onKeyDown={(event) => handleCodeKeyDown(index, event)} onPaste={(event) => handleCodePaste(index, event)} className="h-12 min-w-0 flex-1 rounded-lg border border-gold/25 bg-midnight text-center text-lg text-cream outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 sm:max-w-12" />
+                 ))}
+               </div>
               {message && <p className="text-center text-sm text-goldlite">{message}</p>}
               {error && <p role="alert" className="text-center text-sm text-rose-300">{error}</p>}
               <Button type="submit" className="w-full">Open demo dashboard <ShieldCheck className="h-4 w-4" /></Button>
-              <button type="button" onClick={() => { setStep("email"); setCode(["", "", "", "", "", ""]); setError(""); }} className="mx-auto flex items-center gap-2 text-xs text-lav hover:text-cream"><ArrowLeft className="h-3.5 w-3.5" /> Use another email</button>
+               <button type="button" onClick={() => { setStep("email"); setCode(["", "", "", "", "", ""]); setError(""); }} className="mx-auto flex min-h-11 items-center gap-2 px-3 text-sm text-lav hover:text-cream"><ArrowLeft className="h-3.5 w-3.5" /> Use another email</button>
             </form>
           )}
 
@@ -112,7 +139,7 @@ export default function LoginPage() {
               <p className="mt-1 font-mono text-sm text-cream">{DEMO_USER_EMAIL}</p>
               <p className="mt-3 text-xs text-lav">OTP</p>
               <p className="mt-1 font-mono text-sm text-cream">{DEMO_USER_OTP}</p>
-              <p className="mt-3 text-[11px] text-lav/70">Development-only access. No email is sent.</p>
+               <p className="mt-3 text-xs text-lav">Development-only access. No email is sent.</p>
             </div>
           )}
         </CardContent>

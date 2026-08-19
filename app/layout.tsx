@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
@@ -8,6 +8,13 @@ const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-displa
 export const metadata: Metadata = {
   title: "ProsperPath Numerology | Discover the Power of Your Numbers",
   description: "Discover your unique numerological patterns with a personalized numerology report from ProsperPath Numerology.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

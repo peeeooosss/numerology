@@ -9,31 +9,31 @@ export function OfferReport() {
         <div className="order-2 flex justify-center md:order-1">
           <div className="relative w-64 -rotate-3 transition duration-500 hover:rotate-0 sm:w-72">
             <div className="relative aspect-[3/4] rounded-lg border border-gold/25 bg-gradient-to-b from-[#161b35] to-[#0d0e1c] p-6 shadow-cardglow">
-              <p className="text-[10px] uppercase tracking-[.25em] text-gold/80">Personal numerology report</p>
+               <p className="text-xs uppercase tracking-[.25em] text-gold/80">Personal numerology report</p>
               <div className="mt-4 h-px bg-gold/20" />
               <div className="mt-6 text-center">
                 <span className="text-xs text-lav">Your life path number</span>
                 <span className="mt-1 block font-display text-6xl text-gold">7</span>
-                <span className="text-[10px] text-lav/70">The Seeker of Truth</span>
+                 <span className="text-xs text-lav">The Seeker of Truth</span>
               </div>
               <div className="mt-5 space-y-1.5">
-                <div className="flex items-center gap-2 text-[9px] text-lav/60">
+                 <div className="flex items-center gap-2 text-xs text-lav">
                   <span className="w-20 shrink-0">Expression</span>
                   <div className="h-1.5 flex-1 rounded-full bg-gold/20" />
                   <span>3</span>
                 </div>
-                <div className="flex items-center gap-2 text-[9px] text-lav/60">
+                 <div className="flex items-center gap-2 text-xs text-lav">
                   <span className="w-20 shrink-0">Soul Urge</span>
                   <div className="h-1.5 flex-1 rounded-full bg-gold/20" />
                   <span>11</span>
                 </div>
-                <div className="flex items-center gap-2 text-[9px] text-lav/60">
+                 <div className="flex items-center gap-2 text-xs text-lav">
                   <span className="w-20 shrink-0">Personal Year</span>
                   <div className="h-1.5 flex-1 rounded-full bg-gold/20" />
                   <span>5</span>
                 </div>
               </div>
-              <div className="mt-5 grid grid-cols-3 gap-2 text-center text-[10px] text-lav">
+               <div className="mt-5 grid grid-cols-3 gap-2 text-center text-xs text-lav">
                 <span className="rounded border border-gold/20 py-2">Wealth</span>
                 <span className="rounded border border-gold/20 py-2">Love</span>
                 <span className="rounded border border-gold/20 py-2">Career</span>

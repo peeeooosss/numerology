@@ -58,6 +58,8 @@ type DashboardSession = {
   availabilitySlot?: { startsAt: string } | null;
 };
 
+type DashboardReport = { id: string; reportStatus: string; generatedAt: string | null };
+
 function formatSessionDate(scheduledAt: string, createdAt: string, slotStart?: string) {
   const date = new Date(slotStart || scheduledAt.replace(" · IST", ""));
   const fallback = new Date(createdAt);
@@ -129,6 +131,7 @@ export default function DashboardPage() {
   } | null>(null);
   const [sessionHistory, setSessionHistory] = useState<DashboardSession[]>([]);
   const [sessionSummary, setSessionSummary] = useState({ total: 0, upcoming: 0, completed: 0, cancelled: 0 });
+  const [reportDownloadUrl, setReportDownloadUrl] = useState<string | null>(null);
 
   useEffect(() => {
     // Build real numerology profile from demo client data
@@ -166,6 +169,8 @@ export default function DashboardPage() {
       if (response.ok && data.success) {
         setSessionHistory(data.sessions as DashboardSession[]);
         setSessionSummary(data.summary);
+        const report = (data.client?.reports as DashboardReport[] | undefined)?.find((item) => item.reportStatus === "generated");
+        setReportDownloadUrl(report ? `/api/reports/${report.id}/download` : null);
       }
     } catch {
       // The booking panel remains usable if history is temporarily unavailable.
@@ -174,8 +179,9 @@ export default function DashboardPage() {
 
   useEffect(() => { void refreshSessions(); }, []);
 
-  const today = new Date().toLocaleDateString("en-IN", {
-    weekday: "long",
+     const today = new Date().toLocaleDateString("en-IN", {
+       timeZone: "Asia/Kolkata",
+       weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -186,8 +192,8 @@ export default function DashboardPage() {
   const pyTheme = profile ? (PERSONAL_YEAR_THEMES[profile.personalYear] ?? "") : "";
 
   return (
-    <main className="min-h-screen bg-cosmic-field text-cream">
-      <div className="flex min-h-screen">
+    <main className="min-h-screen-dynamic bg-cosmic-field text-cream">
+      <div className="min-h-screen-dynamic flex">
         <Sidebar open={menuOpen} close={() => setMenuOpen(false)} />
         {menuOpen && (
           <button
@@ -290,13 +296,13 @@ export default function DashboardPage() {
                         {dailyGuidance?.energyScore ?? "—"}
                         <span className="text-xl text-lav">/100</span>
                       </p>
-                      <p className="mt-1 text-[10px] text-lav">
+                       <p className="mt-1 text-xs text-lav">
                         Personal Day {profile?.personalDay ?? "…"}
                       </p>
                     </div>
                     {dailyGuidance && (
                       <div className="rounded-xl border border-gold/15 bg-white/5 px-4 py-3 text-center">
-                        <p className="mb-2 text-[10px] uppercase tracking-widest text-lav">
+                         <p className="mb-2 text-xs uppercase tracking-widest text-lav">
                           Lucky numbers
                         </p>
                         <div className="flex gap-2">
@@ -330,7 +336,7 @@ export default function DashboardPage() {
                     <CardContent className="p-4 text-center">
                       <p className="text-xs text-lav">{label}</p>
                       <p className="mt-1 font-display text-3xl text-gold">{value}</p>
-                      <p className="mt-1 text-[10px] text-lav/70">{sub}</p>
+                       <p className="mt-1 text-xs text-lav">{sub}</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -408,10 +414,7 @@ export default function DashboardPage() {
                   <CalendarDays className="h-4 w-4 text-gold" />
                   Booking History
                 </h2>
-                <Button variant="outline" size="sm">
-                  <FileText className="h-4 w-4" />
-                  Download report
-                </Button>
+                 {reportDownloadUrl ? <a href={reportDownloadUrl} download className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-gold/30 bg-white/[.03] px-3 py-2 text-sm font-semibold text-cream transition hover:border-gold/70 hover:bg-gold/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"><FileText className="h-4 w-4" />Download report</a> : <span className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-sm text-lav" title="Your generated report will appear here"> <FileText className="h-4 w-4" />Report unavailable</span>}
               </div>
               <div className="mb-4 grid gap-3 sm:grid-cols-4">
                 {[
