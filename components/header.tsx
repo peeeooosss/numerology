@@ -7,9 +7,10 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const links = [
     ["Free Analysis", "/analyzer"],
-    ["Insights", "#insights"],
-    ["Your Journey", "#journey"],
-    ["About", "#about"],
+    ["₹99 Report", "/#offer-99"],
+    ["Insights", "/#insights"],
+    ["Your Journey", "/#journey"],
+    ["About", "/#about"],
     ["Client Login", "/login"],
   ];
 
@@ -20,7 +21,7 @@ export function Header() {
         {links.map(([label, href]) => <a key={label} href={href} className="min-h-11 inline-flex items-center text-sm text-lav transition hover:text-cream">{label}</a>)}
       </nav>
       <div className="flex items-center gap-2">
-        <a href="#offer-99" className="group inline-flex min-h-11 items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-3 py-2 text-sm font-semibold text-midnight shadow-goldglow transition hover:brightness-110 sm:px-5"><Sparkles className="h-4 w-4" /> <span className="hidden sm:inline">Get ₹99 Report</span><span className="sm:hidden">₹99 Report</span><ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" /></a>
+        <a href="/#offer-99" className="group hidden min-h-11 items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-3 py-2 text-sm font-semibold text-midnight shadow-goldglow transition hover:brightness-110 sm:inline-flex sm:px-5"><Sparkles className="h-4 w-4" />Get ₹99 Report<ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" /></a>
         <button type="button" aria-label={open ? "Close navigation" : "Open navigation"} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen((value) => !value)} className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-gold/20 text-lav transition hover:bg-white/5 hover:text-cream lg:hidden">
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
