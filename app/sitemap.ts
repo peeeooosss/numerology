@@ -103,6 +103,54 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.8,
     },
+    {
+      url: `${siteUrl}/tools`,
+      lastModified: launchDate,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/personal-day-calculator`,
+      lastModified: launchDate,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/name-comparison-calculator`,
+      lastModified: launchDate,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/numerology-compatibility-calculator`,
+      lastModified: launchDate,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/business-name-numerology-calculator`,
+      lastModified: launchDate,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/lucky-date-calculator`,
+      lastModified: launchDate,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/numerology-cycles-calculator`,
+      lastModified: launchDate,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/session-question-builder`,
+      lastModified: launchDate,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
   ];
 
   return [...staticPages, ...BLOG_POSTS.map((post) => ({

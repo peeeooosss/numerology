@@ -7,6 +7,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const links = [
     ["Free Analysis", "/analyzer"],
+    ["Free Tools", "/tools"],
     ["Reports", "/report"],
     ["Name Balance", "/name-balance"],
     ["Consultation", "/consultation"],

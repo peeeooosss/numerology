@@ -12,6 +12,9 @@ export function Footer() {
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-lav">
+            <a href="/tools" className="transition hover:text-gold">
+              Free Tools
+            </a>
             <a href="/report" className="transition hover:text-gold">
               Reports
             </a>
