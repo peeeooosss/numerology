@@ -1,4 +1,4 @@
-import { ChartNoAxesColumnIncreasing, LockKeyhole, ScrollText, ShieldCheck, Sparkles } from "lucide-react";
+import { ChartNoAxesColumnIncreasing, LockKeyhole, ScrollText, ShieldCheck, Sparkles, Calculator, BookOpen } from "lucide-react";
 import { Mandala } from "./mandala";
 import { LandingImage } from "./landing-image";
 
@@ -11,9 +11,14 @@ export function Hero() {
     <div className="relative mx-auto max-w-4xl text-center">
        <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-gold/30 px-4 py-1.5 text-xs uppercase tracking-[.2em] text-goldlite"><Sparkles className="h-3.5 w-3.5 text-gold" />Free numerology calculator and guidance</p>
        <h1 className="font-display text-4xl font-semibold leading-[1.08] text-cream sm:text-5xl md:text-7xl">Calculate your numbers. <em className="bg-gradient-to-r from-gold via-goldlite to-copper bg-clip-text text-transparent">Understand</em> your patterns.</h1>
-      <p className="mx-auto mt-6 max-w-2xl font-display text-xl leading-relaxed text-goldlite md:text-2xl">Your Date of Birth Has a Story. Let’s Decode It.</p>
+      <p className="mx-auto mt-6 max-w-2xl font-display text-xl leading-relaxed text-goldlite md:text-2xl">Your Date of Birth Has a Story. Let&apos;s Decode It.</p>
       <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-lav md:text-lg">Discover your unique numerological patterns and gain personalized insights into your personality, career, relationships, money tendencies, strengths, challenges, and life direction.</p>
-       <div className="mt-10 flex flex-col items-center gap-4"><a href="/analyzer" className="animate-pulse-glow inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-gold via-goldlite to-copper px-7 py-4 text-sm font-semibold text-midnight transition hover:scale-[1.03] sm:px-8 sm:text-base"><ScrollText className="h-5 w-5" /> Start your free analysis</a><p className="flex items-center gap-2 text-xs text-lav/80"><LockKeyhole className="h-3.5 w-3.5 text-gold" /> No signup · See your core numbers in seconds</p></div>
+       <div className="mt-10 flex flex-col items-center gap-4"><a href="/analyzer" className="animate-pulse-glow inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-gold via-goldlite to-copper px-7 py-4 text-sm font-semibold text-midnight transition hover:scale-[1.03] sm:px-8 sm:text-base"><ScrollText className="h-5 w-5" /> Start your free analysis</a>
+       <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+         <a href="/tools" className="inline-flex items-center gap-1.5 text-sm text-goldlite transition hover:text-gold"><Calculator className="h-4 w-4" /> 12 free tools</a>
+         <a href="/blog" className="inline-flex items-center gap-1.5 text-sm text-goldlite transition hover:text-gold"><BookOpen className="h-4 w-4" /> Numerology guides</a>
+       </div>
+       <p className="flex items-center gap-2 text-xs text-lav/80"><LockKeyhole className="h-3.5 w-3.5 text-gold" /> No signup · See your core numbers in seconds</p></div>
       <div className="mt-14 flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm text-lav sm:gap-x-10"><span className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-gold" />Structured analysis</span><span className="flex items-center gap-2"><ChartNoAxesColumnIncreasing className="h-4 w-4 text-gold" />Personalized insights</span><span className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-gold" />Private & confidential</span></div>
     </div>
   </section>;

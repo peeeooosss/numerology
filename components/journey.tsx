@@ -1,10 +1,10 @@
-import { ArrowRight, ClipboardList, CreditCard, FileText, Sparkles } from "lucide-react";
+import { ArrowRight, ScrollText, Calculator, CreditCard, Sparkles } from "lucide-react";
 
 const steps = [
-  { icon: ClipboardList, number: "01", title: "Enter Your Details", description: "Provide your name and date of birth through our secure form." },
-  { icon: CreditCard, number: "02", title: "Make Your Payment", description: "Complete your purchase securely online for just ₹99." },
-  { icon: FileText, number: "03", title: "Receive Your Personalized Report", description: "Your numerology report is prepared based on the information you provide." },
-  { icon: Sparkles, number: "04", title: "Go Deeper If You Choose", description: "Explore our ₹499 Name Balance Analysis or book a 1-to-1 consultation for more personalized guidance." },
+  { icon: ScrollText, number: "01", title: "Start Free", description: "Run the free analysis with your name and date of birth. See your Driver Number, Life Path, and Lo Shu pattern." },
+  { icon: Calculator, number: "02", title: "Use Focused Tools", description: "Try name comparison, Personal Day, compatibility, or any of 12 free calculators built for specific questions." },
+  { icon: CreditCard, number: "03", title: "Go Deeper If You Choose", description: "Get your detailed ₹99 report, a ₹499 Name Balance session, or book a live ₹999 consultation." },
+  { icon: Sparkles, number: "04", title: "Understand Your Patterns", description: "Receive a clear, structured profile designed to support reflection, better questions, and more intentional decisions." },
 ];
 
 export function Journey() {
@@ -13,7 +13,7 @@ export function Journey() {
       <div className="mx-auto max-w-6xl">
         <div className="text-center">
           <p className="mb-3 text-xs uppercase tracking-[.2em] text-gold">Simple, clear, personal</p>
-          <h2 className="font-display text-3xl font-semibold text-cream md:text-4xl">Your Journey Starts With Just ₹99</h2>
+          <h2 className="font-display text-3xl font-semibold text-cream md:text-4xl">How It Works</h2>
         </div>
 
         <div className="mt-12 grid gap-4 md:grid-cols-4">

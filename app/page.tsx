@@ -4,6 +4,9 @@ import { AvailabilityPreview } from "@/components/availability-preview";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { Hero } from "@/components/hero";
+import { HomeDiscovery } from "@/components/home-discovery";
+import { HomeTools } from "@/components/home-tools";
+import { HomeGuides } from "@/components/home-guides";
 import { OfferReport } from "@/components/offer-report";
 import { SessionOffer } from "@/components/session-offer";
 import { NameBalancingOffer } from "@/components/name-balancing-offer";
@@ -50,15 +53,39 @@ const jsonLd = {
       "@type": "WebPage",
       "@id": `${siteUrl}#webpage`,
       url: siteUrl,
-      name: "Free Numerology Calculator & Online Reports | Magic of Numbers",
+      name: "Free Numerology Calculator, Tools & Guides | Magic of Numbers",
       isPartOf: { "@id": `${siteUrl}#website` },
       about: { "@id": `${siteUrl}#vinod` },
       description:
-        "Calculate your Name Number, Driver Number, Life Path, Personal Year and Lo Shu pattern free. Explore personalized reports and online numerology guidance.",
+        "Free numerology calculators, 12 focused tools, 8 plain-language guides, and personalized reports. Calculate your Driver Number, Life Path, Personal Day, and Lo Shu pattern.",
     },
     {
       "@type": "FAQPage",
       mainEntity: HOME_FAQS.map(([name, text]) => ({ "@type": "Question", name, acceptedAnswer: { "@type": "Answer", text } })),
+    },
+    {
+      "@type": "ItemList",
+      name: "Free Numerology Tools",
+      description: "12 free calculators and reflection tools for numerology.",
+      url: `${siteUrl}/tools`,
+      numberOfItems: 12,
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Free Analysis", url: `${siteUrl}/analyzer` },
+        { "@type": "ListItem", position: 2, name: "Name Comparison Calculator", url: `${siteUrl}/name-comparison-calculator` },
+        { "@type": "ListItem", position: 3, name: "Personal Day Calculator", url: `${siteUrl}/personal-day-calculator` },
+      ],
+    },
+    {
+      "@type": "ItemList",
+      name: "Numerology Guides",
+      description: "Plain-language guides on Driver Numbers, Lo Shu Grid, name analysis, and timing.",
+      url: `${siteUrl}/blog`,
+      numberOfItems: 8,
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Personal Day Number Calculator", url: `${siteUrl}/blog/personal-day-number-calculator` },
+        { "@type": "ListItem", position: 2, name: "Name Correction vs Name Balance", url: `${siteUrl}/blog/name-correction-vs-name-balance` },
+        { "@type": "ListItem", position: 3, name: "Pinnacle and Challenge Numbers", url: `${siteUrl}/blog/pinnacle-and-challenge-numbers` },
+      ],
     },
   ],
 };
@@ -73,9 +100,11 @@ export default function HomePage() {
       <Header />
       <MobileFreeAnalysisBar />
       <Hero />
+      <HomeDiscovery />
       <ReportInsights />
+      <HomeTools />
+      <HomeGuides />
       <Testimonials />
-      <HomeFaq />
       <OfferReport />
       <OfferComparison />
       <Journey />
@@ -84,6 +113,7 @@ export default function HomePage() {
       <AvailabilityPreview />
       <AuraPreview />
       <About />
+      <HomeFaq />
       <Footer />
     </main>
   );
