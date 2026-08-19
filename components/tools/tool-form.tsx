@@ -2,9 +2,8 @@
 
 import { FormEvent, useState, useEffect } from "react";
 import { ArrowRight, Loader2, LockKeyhole } from "lucide-react";
-import type { ToolDefinition, ToolField, ToolCalculationResult, ToolResult, ToolSlug } from "@/lib/tools/tool-types";
-import { ResultCard } from "./result-card";
-import { ToolUpsell } from "./tool-upsell";
+import type { ToolDefinition, ToolField, ToolSlug } from "@/lib/tools/tool-types";
+import { useToolContext } from "@/lib/tools/tool-context";
 import { trackToolEvent } from "@/lib/tools/analytics";
 
 type Props = {
@@ -19,8 +18,8 @@ function fieldId(slug: string, name: string) {
 }
 
 export function ToolForm({ tool, slug }: Props) {
+  const { setResult } = useToolContext();
   const [values, setValues] = useState<Record<string, string>>({});
-  const [result, setResult] = useState<ToolResult | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -44,7 +43,7 @@ export function ToolForm({ tool, slug }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug, ...values }),
       });
-      const payload = await response.json() as { success: boolean; result?: ToolResult; error?: string };
+      const payload = await response.json() as { success: boolean; result?: import("@/lib/tools/tool-types").ToolResult; error?: string };
       if (!response.ok || !payload.success || !payload.result) {
         throw new Error(payload.error || "Calculation failed.");
       }
@@ -58,11 +57,6 @@ export function ToolForm({ tool, slug }: Props) {
     } finally {
       setLoading(false);
     }
-  }
-
-  function reset() {
-    setResult(null);
-    setError("");
   }
 
   function renderField(field: ToolField) {
@@ -130,22 +124,6 @@ export function ToolForm({ tool, slug }: Props) {
           className="h-12 w-full rounded-xl border border-gold/20 bg-white/[.04] px-4 text-base text-cream outline-none placeholder:text-lav/70 focus:border-gold focus:ring-2 focus:ring-gold/20"
         />
       </div>
-    );
-  }
-
-  if (result) {
-    return (
-      <>
-        <ResultCard calculation={result.calculation} onReset={reset} />
-        <div className="mt-8">
-          <ToolUpsell
-            primaryCta={result.primaryCta}
-            primaryCtaLabel={result.primaryCtaLabel}
-            secondaryCta={result.secondaryCta}
-            secondaryCtaLabel={result.secondaryCtaLabel}
-          />
-        </div>
-      </>
     );
   }
 
