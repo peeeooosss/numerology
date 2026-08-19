@@ -10,6 +10,9 @@ public/reports/*.pdf
 *.log
 *.tsbuildinfo
 .vercel-token
+.reports/
 
 # Local Netlify folder
 .netlify
+.vercel
+.env*

@@ -27,6 +27,7 @@ export async function GET(
         "Content-Disposition": `attachment; filename="numerology-report-${params.id}.pdf"`,
         "Content-Length": String(pdfBuffer.length),
         "Cache-Control": "no-store",
+        "X-Robots-Tag": "noindex, nofollow, noarchive",
       },
     });
   } catch (err) {

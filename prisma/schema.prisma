@@ -91,6 +91,22 @@ model Report {
   @@index([clientId, createdAt])
 }
 
+model Payment {
+  id                String   @id @default(cuid())
+  providerOrderId   String   @unique
+  providerPaymentId String?  @unique
+  productType       String
+  amountPaise       Int
+  currency          String   @default("INR")
+  status            String   @default("created")
+  metadataJson      String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([providerPaymentId, status])
+  @@index([productType, status, createdAt])
+}
+
 model UserAccount {
   id                  String        @id @default(cuid())
   clientId            String        @unique

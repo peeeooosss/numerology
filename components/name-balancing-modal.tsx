@@ -7,6 +7,7 @@ import { NameBalancingIntakeFields } from "@/components/name-balancing-intake-fi
 import { formatDateOfBirth, initialSessionIntake, type SessionIntakeValues } from "@/lib/session-intake";
 import { getService } from "@/lib/services";
 import { useModal } from "@/lib/use-modal";
+import { openRazorpayCheckout, type RazorpayPaymentResponse } from "@/lib/razorpay-client";
 
 type Slot = { id: string; startsAt: string; label: string };
 type BookingState = "form" | "processing" | "confirmed" | "error";
@@ -58,10 +59,17 @@ export function NameBalancingModal() {
     setState("processing");
     setError("");
     try {
-      const orderResponse = await fetch("/api/payments/create-order", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ serviceType: "name-balancing", name: form.name, email: form.email || undefined }) });
-      const order = await orderResponse.json();
-      if (!orderResponse.ok || !order.success) throw new Error(order.error || "Test order failed");
-      if (order.mode !== "development") throw new Error("Live Razorpay checkout is not enabled in this test build.");
+       const orderResponse = await fetch("/api/payments/create-order", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ productType: "name-balancing", name: form.name, email: form.email || undefined }) });
+       const order = await orderResponse.json();
+       if (!orderResponse.ok || !order.success) throw new Error(order.error || "Payment order could not be created.");
+       let paymentId = order.orderId;
+       if (order.mode !== "development") {
+         const payment: RazorpayPaymentResponse = await openRazorpayCheckout({ key: order.keyId, amount: order.amount, currency: order.currency, orderId: order.orderId, name: "Magic of Numbers", description: "Name Balance Consultation", prefill: { name: form.name, email: form.email, contact: form.phone } });
+         const verifyResponse = await fetch("/api/payments/verify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payment) });
+         const verify = await verifyResponse.json();
+         if (!verifyResponse.ok || !verify.success) throw new Error(verify.error || "Payment verification failed.");
+         paymentId = payment.razorpay_payment_id;
+       }
 
       const bookingResponse = await fetch("/api/sessions/book", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         name: form.name || form.currentName,
@@ -86,7 +94,7 @@ export function NameBalancingModal() {
         mustPreserve: form.mustPreserve,
         legalChange: form.legalChange,
         slotId: selected.id,
-        paymentId: order.orderId,
+         paymentId,
       }) });
       const booking = await bookingResponse.json();
       if (!bookingResponse.ok || !booking.success) throw new Error(booking.error || "Booking could not be saved");

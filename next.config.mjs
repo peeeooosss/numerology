@@ -7,14 +7,14 @@ const nextConfig = {
     serverComponentsExternalPackages: ["@react-pdf/renderer", "canvas"],
   },
 
-  // Allow PDF downloads from /public/reports
   async headers() {
     return [
       {
-        source: "/reports/:path*",
+        source: "/(.*)",
         headers: [
-          { key: "Content-Type", value: "application/pdf" },
-          { key: "Cache-Control", value: "no-store" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
         ],
       },
     ];

@@ -4,7 +4,6 @@ import path from "path";
 import {
   Document,
   Font,
-  Image,
   Page,
   StyleSheet,
   Text,
@@ -18,11 +17,8 @@ import {
   PERSONAL_YEAR_INTERPRETATIONS,
 } from "./interpretations";
 import type { AIReportContent } from "./ai/report-schema";
-import type { LoShuResult } from "./lo-shu";
+import { LOSHU_ROWS, type LoShuResult } from "./lo-shu";
 import type { BasicReportContent } from "./interpretations-loshu";
-
-const LOCKED_GRID_IMAGE_URL =
-  "https://encrypted-tbn3.gstatic.com/licensed-image?q=tbn:ANd9GcSmE1MKyJA6khmKCCCwFkxlx_ylwI0sm4j4TGRvOV74OeFhRjw1dJGLv3OOVBOngZGGZPFwL0DTcP3LQPI";
 
 // ─── FONTS (local, no CDN dependency) ────────────────────────────────────────
 const FONTS_DIR = path.join(process.cwd(), "public", "fonts");
@@ -269,16 +265,135 @@ const S = StyleSheet.create({
     lineHeight: 1.7,
   },
 
-  // ── Lo Shu teaser ──
-  lockedImage: {
-    width: 220,
-    height: 126,
-    objectFit: "cover",
-    alignSelf: "center",
-    marginVertical: 16,
-    borderRadius: 8,
+  // ── Lo Shu energy map ──
+  loShuGridFrame: {
+    backgroundColor: C.bg,
     borderWidth: 1,
     borderColor: C.gold,
+    borderRadius: 12,
+    padding: 10,
+    marginTop: 8,
+    marginBottom: 14,
+  },
+  loShuGridHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 8,
+    paddingBottom: 9,
+    marginBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: C.divider,
+  },
+  loShuGridHeaderLabel: {
+    fontSize: 7,
+    letterSpacing: 2,
+    color: C.gold,
+    textTransform: "uppercase",
+  },
+  loShuGridHeaderSub: {
+    fontSize: 7,
+    color: C.lav,
+  },
+  loShuGrid: {
+    borderWidth: 2,
+    borderColor: C.gold,
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  loShuGridRow: {
+    flexDirection: "row",
+  },
+  loShuCell: {
+    flex: 1,
+    minHeight: 86,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: C.bgCard,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: C.divider,
+    paddingVertical: 9,
+    paddingHorizontal: 4,
+  },
+  loShuCellLastColumn: {
+    borderRightWidth: 0,
+  },
+  loShuCellLastRow: {
+    borderBottomWidth: 0,
+  },
+  loShuCellPresent: {
+    backgroundColor: C.bgLight,
+  },
+  loShuCellMissing: {
+    backgroundColor: "#111326",
+  },
+  loShuCellComplete: {
+    borderTopWidth: 2,
+    borderTopColor: C.goldLight,
+  },
+  loShuDigit: {
+    fontFamily: "Playfair",
+    fontSize: 26,
+    color: C.goldLight,
+    lineHeight: 1,
+  },
+  loShuMarkers: {
+    fontSize: 10,
+    color: C.gold,
+    minHeight: 14,
+    marginTop: 6,
+    letterSpacing: 1,
+  },
+  loShuMissingLabel: {
+    fontSize: 6,
+    color: C.lav,
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+    minHeight: 14,
+    marginTop: 6,
+  },
+  loShuCount: {
+    fontSize: 6,
+    color: C.cream,
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+    marginTop: 3,
+  },
+  loShuLegend: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 9,
+  },
+  loShuLegendText: {
+    fontSize: 7,
+    color: C.lav,
+  },
+  loShuSummaryRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 14,
+  },
+  loShuSummaryCard: {
+    flex: 1,
+    backgroundColor: C.bgCard,
+    borderWidth: 1,
+    borderColor: C.divider,
+    borderRadius: 7,
+    padding: 9,
+    minHeight: 48,
+  },
+  loShuSummaryLabel: {
+    fontSize: 6,
+    color: C.gold,
+    letterSpacing: 1,
+    textTransform: "uppercase",
+    marginBottom: 4,
+  },
+  loShuSummaryValue: {
+    fontSize: 8,
+    color: C.cream,
+    lineHeight: 1.4,
   },
   secretCallout: {
     backgroundColor: C.bgCard,
@@ -494,6 +609,83 @@ function Bullet({ text }: { text: string }) {
   );
 }
 
+function LoShuGridTable({ grid }: { grid: LoShuResult }) {
+  const completedDigits = new Set(
+    grid.completedLines.flatMap((line) => line.digits)
+  );
+  const repeatedDigits = new Set(grid.repeated.map(({ digit }) => digit));
+
+  return (
+    <>
+      <View style={S.loShuGridFrame}>
+        <View style={S.loShuGridHeader}>
+          <Text style={S.loShuGridHeaderLabel}>DOB Energy Matrix</Text>
+          <Text style={S.loShuGridHeaderSub}>4 · 9 · 2 / 3 · 5 · 7 / 8 · 1 · 6</Text>
+        </View>
+
+        <View style={S.loShuGrid}>
+          {LOSHU_ROWS.map((row, rowIndex) => (
+            <View key={row.join("-")} style={S.loShuGridRow}>
+              {row.map((digit, columnIndex) => {
+                const count = grid.counts[digit];
+                const isLastColumn = columnIndex === row.length - 1;
+                const isLastRow = rowIndex === LOSHU_ROWS.length - 1;
+
+                return (
+                  <View
+                    key={digit}
+                    style={[
+                      S.loShuCell,
+                      count > 0 ? S.loShuCellPresent : S.loShuCellMissing,
+                      completedDigits.has(digit) ? S.loShuCellComplete : {},
+                      isLastColumn ? S.loShuCellLastColumn : {},
+                      isLastRow ? S.loShuCellLastRow : {},
+                    ]}
+                  >
+                    <Text style={S.loShuDigit}>{digit}</Text>
+                    {count > 0 ? (
+                      <Text style={S.loShuMarkers}>{"● ".repeat(count).trim()}</Text>
+                    ) : (
+                      <Text style={S.loShuMissingLabel}>Missing</Text>
+                    )}
+                    <Text style={S.loShuCount}>
+                      {count} present
+                      {repeatedDigits.has(digit) ? " · repeated" : ""}
+                    </Text>
+                  </View>
+                );
+              })}
+            </View>
+          ))}
+        </View>
+
+        <View style={S.loShuLegend}>
+          <Text style={S.loShuLegendText}>
+            ● frequency   ·   muted cells are missing   ·   gold top edge marks a completed line
+          </Text>
+        </View>
+      </View>
+
+      <View style={S.loShuSummaryRow}>
+        <View style={S.loShuSummaryCard}>
+          <Text style={S.loShuSummaryLabel}>Missing numbers</Text>
+          <Text style={S.loShuSummaryValue}>
+            {grid.missing.length > 0 ? grid.missing.join(" · ") : "None"}
+          </Text>
+        </View>
+        <View style={S.loShuSummaryCard}>
+          <Text style={S.loShuSummaryLabel}>Completed lines</Text>
+          <Text style={S.loShuSummaryValue}>
+            {grid.completedLines.length > 0
+              ? grid.completedLines.map((line) => line.label).join(" · ")
+              : "Building strength"}
+          </Text>
+        </View>
+      </View>
+    </>
+  );
+}
+
 function PageChrome({
   clientName,
   section,
@@ -516,7 +708,7 @@ function PageChrome({
         <View style={S.pageFooter}>
           <Text style={S.footerText}>Confidential — prepared exclusively for {clientName}</Text>
           <Text style={S.footerText}>
-            © {new Date().getFullYear()} Vinod Numerology | numerologywithvinod.com
+            © {new Date().getFullYear()} Magic of Numbers | magicofnumbers.in
           </Text>
         </View>
       </View>
@@ -538,14 +730,14 @@ export interface ReportData {
   core: CoreNumbers;
   monthlyForecast: MonthlyForecast[];
   aiContent?: AIReportContent;
-  loShuGrid?: LoShuResult;
+  loShuGrid: LoShuResult;
   basicContent?: BasicReportContent;
 }
 
 // ─── DOCUMENT ─────────────────────────────────────────────────────────────────
 
 export function NumerologyReportDocument({ data }: { data: ReportData }) {
-  const { client, core, monthlyForecast, aiContent, basicContent } = data;
+  const { client, core, monthlyForecast, aiContent, loShuGrid, basicContent } = data;
 
   const lpInterp: Interpretation =
     LIFE_PATH_INTERPRETATIONS[core.lifePath] ??
@@ -1112,7 +1304,7 @@ export function NumerologyReportDocument({ data }: { data: ReportData }) {
           <Text style={S.cardBody}>
             This report is the foundation. Your session is where everything becomes specific to your life —
             your actual questions, your specific timing, the decisions you are currently facing.
-            Book at aura-numerology.com with the code from your confirmation email.
+            Book at magicofnumbers.in/consultation from your confirmation email.
           </Text>
         </View>
 
@@ -1213,10 +1405,10 @@ export function NumerologyReportDocument({ data }: { data: ReportData }) {
         </PageChrome>
       )}
 
-      {/* ── PAGE 13: FINAL SECRET ────────────────────────────────────────── */}
+      {/* ── PAGE 13: COMPLETE LO SHU BLUEPRINT ───────────────────────────── */}
       {basicContent && (
-        <PageChrome clientName={client.name} section="Your Locked Blueprint">
-          <Text style={S.sectionEyebrow}>The Final Secret</Text>
+        <PageChrome clientName={client.name} section="Complete Lo Shu Blueprint">
+          <Text style={S.sectionEyebrow}>Your Complete Energy Map</Text>
           <Text style={S.sectionTitle}>Your Complete Energy Map</Text>
 
           <View style={S.secretCallout}>
@@ -1237,18 +1429,15 @@ export function NumerologyReportDocument({ data }: { data: ReportData }) {
             </Text>
 
             <Text style={[S.bodyWhite, { fontWeight: "bold", color: C.goldLight, marginTop: 8 }]}>
-              Your personalized grid is currently locked.
+              Your personalized Lo Shu Energy Map is revealed below.
             </Text>
 
-            <Image src={LOCKED_GRID_IMAGE_URL} style={S.lockedImage} />
-
-            <Text style={[S.body, { fontSize: 7, textAlign: "center", color: C.gold }]}>
-              {LOCKED_GRID_IMAGE_URL}
-            </Text>
+            {loShuGrid && <LoShuGridTable grid={loShuGrid} />}
 
             <Text style={S.bodyWhite}>
-              To unlock your exact missing numbers, understand your karmic blockages, and receive the specific
-              remedies to balance your energy for maximum success, you need a master's eye.
+              The table shows your exact number frequencies from your date of birth, Driver, and Conductor.
+              A master's reading can now take you deeper into what each missing number means, how the completed
+              lines support you, and which practical actions can help you work with this pattern.
             </Text>
 
             <Text style={S.secretCta}>
@@ -1256,7 +1445,7 @@ export function NumerologyReportDocument({ data }: { data: ReportData }) {
             </Text>
           </View>
 
-          <Text style={[S.body, { textAlign: "center", fontSize: 8 }]}>Session booking: numerologywithvinod.com</Text>
+          <Text style={[S.body, { textAlign: "center", fontSize: 8 }]}>Session booking: magicofnumbers.in/consultation</Text>
         </PageChrome>
       )}
     </Document>

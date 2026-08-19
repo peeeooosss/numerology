@@ -17,12 +17,14 @@ The ₹99 PDF keeps the existing Western/Vedic report pages and appends three de
 
 - Driver and Conductor numbers with a positive two-paragraph profile.
 - Exactly one positive Lo Shu strength, selected from a completed line or repeated digit.
-- The Final Secret teaser showing only the missing-number count and a locked-grid call to action.
+- A complete, visually styled 3×3 Lo Shu Energy Map showing every number position, frequency markers,
+  missing-number states, and completed-line highlights.
 
-The PDF never displays the filled Lo Shu grid, the missing-number list, negative repeated-number interpretations,
-or grid-specific remedies. After a ₹999 session is marked `completed`, the existing `DashboardAccess` entitlement
-unlocks `/dashboard/lo-shu-blueprint`, which exposes the full grid, missing-number analysis, and personalised
-grid remedies through `/api/dashboard/lo-shu`.
+The PDF displays the calculated grid and missing-number list, but does not include negative repeated-number
+interpretations or grid-specific remedies. The exact methodology is shared with the dashboard: non-zero digits
+from the date of birth plus the Vedic Driver and Conductor numbers. After a ₹999 session is marked `completed`,
+the existing `DashboardAccess` entitlement unlocks `/dashboard/lo-shu-blueprint`, which exposes the full grid,
+missing-number analysis, and personalised grid remedies through `/api/dashboard/lo-shu`.
 
 ## Local Setup
 

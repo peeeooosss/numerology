@@ -25,7 +25,7 @@ export async function GET(
         aiModel: report.aiModel,
         methodologyVersion: report.methodologyVersion,
         generatedAt: report.generatedAt,
-        pdfUrl: report.pdfPath ? `/reports/${report.id}.pdf` : null,
+        pdfUrl: report.pdfPath ? `/api/reports/${report.id}/download` : null,
         core: {
           lifePath: report.lifePathNumber,
           expression: report.expressionNumber,

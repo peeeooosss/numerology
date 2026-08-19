@@ -1,0 +1,4 @@
+import type { Metadata } from "next";
+import { CalculatorPage } from "@/components/calculators/calculator-page";
+export const metadata: Metadata = { title: "Life Path Number Calculator", description: "Calculate your Life Path Number from your date of birth and explore a short reflective interpretation.", alternates: { canonical: "https://magicofnumbers.in/life-path-number-calculator" } };
+export default function Page() { return <CalculatorPage kind="life-path" label="Life Path Number" title="Life Path Number Calculator" description="Calculate the Life Path Number associated with your date of birth using the Magic of Numbers calculation method." explanation="The Life Path Number is derived from the date of birth and is traditionally used to reflect on broad themes, learning, and direction. It is not a fixed identity or a prediction of what must happen." related="Read how Life Path, Driver, and Conductor Numbers differ in a complete profile." />; }

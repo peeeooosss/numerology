@@ -23,7 +23,7 @@ import { AI_REPORT_SCHEMA_VERSION } from "./ai/report-schema";
 const IS_SERVERLESS = process.env.VERCEL || process.env.NETLIFY || process.env.AWS_LAMBDA_FUNCTION_NAME;
 const REPORTS_DIR = IS_SERVERLESS
   ? path.join("/tmp", "reports")
-  : path.join(process.cwd(), "public", "reports");
+  : path.resolve(process.env.REPORTS_DIR || path.join(process.cwd(), ".reports"));
 const METHODOLOGY_VERSION = "western-pythagorean+vedic-driver-conductor-chaldean+lo-shu-v1";
 
 function ensureReportsDir() {
@@ -40,8 +40,7 @@ export interface GenerateReportInput {
   focusArea?: string;
   question?: string;
   goal?: string;
-  paymentId?: string;
-  amountPaid?: number;
+  paymentId: string;
 }
 
 export interface GeneratedReportResult {
@@ -79,7 +78,7 @@ export async function generateReport(input: GenerateReportInput): Promise<Genera
       return {
         reportId: existing.id,
         pdfPath: existing.pdfPath ?? "",
-        pdfUrl: `/reports/${existing.id}.pdf`,
+        pdfUrl: `/api/reports/${existing.id}/download`,
         core: buildNumerologyProfile(input.dateOfBirth, input.fullBirthName, "western", input.currentName),
         aiStatus: existing.aiStatus,
         aiModel: existing.aiModel || "unknown",
@@ -90,7 +89,7 @@ export async function generateReport(input: GenerateReportInput): Promise<Genera
       return {
         reportId: existing.id,
         pdfPath: existing.pdfPath,
-        pdfUrl: `/reports/${existing.id}.pdf`,
+        pdfUrl: `/api/reports/${existing.id}/download`,
         core: buildNumerologyProfile(input.dateOfBirth, input.fullBirthName, "western", input.currentName),
         aiStatus: existing.aiStatus,
         aiModel: existing.aiModel || "unknown",
@@ -155,9 +154,9 @@ export async function generateReport(input: GenerateReportInput): Promise<Genera
       conductorNumber: core.vedic.conductor,
       missingNumberCount: basicContent.missingCount,
       loShuFactsJson: JSON.stringify({ loShuGrid, majorStrength }),
-      paymentStatus: input.paymentId ? "paid" : "free",
+      paymentStatus: "paid",
       paymentId: input.paymentId,
-      amountPaid: input.amountPaid ?? 99,
+      amountPaid: 99,
       reportStatus: "generating",
       aiStatus: "pending",
       aiPromptVersion: AI_REPORT_SCHEMA_VERSION,
@@ -224,7 +223,7 @@ export async function generateReport(input: GenerateReportInput): Promise<Genera
     return {
       reportId: reportRecord.id,
       pdfPath: filePath,
-      pdfUrl: `/reports/${fileName}`,
+      pdfUrl: `/api/reports/${reportRecord.id}/download`,
       core,
       aiStatus: aiResult.status,
       aiModel: aiResult.model,

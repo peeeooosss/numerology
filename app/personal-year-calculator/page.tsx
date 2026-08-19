@@ -1,0 +1,4 @@
+import type { Metadata } from "next";
+import { CalculatorPage } from "@/components/calculators/calculator-page";
+export const metadata: Metadata = { title: "Personal Year Number Calculator", description: "Calculate your Personal Year Number for a selected year from your date of birth and read its short traditional theme.", alternates: { canonical: "https://magicofnumbers.in/personal-year-calculator" } };
+export default function Page() { return <CalculatorPage kind="personal-year" label="Personal Year" title="Personal Year Number Calculator" description="Choose a year and calculate the Personal Year Number associated with your date of birth." explanation="Personal Year is time-specific, so this calculator asks for the year you want to explore. Traditional interpretations use it as a reflection on a year's broad themes, not as a guarantee of events." related="Read the Personal Year guide to understand how a yearly number differs from a month-by-month forecast." />; }

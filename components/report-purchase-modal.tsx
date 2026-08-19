@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatDateOfBirth } from "@/lib/session-intake";
 import { useModal } from "@/lib/use-modal";
+import { openRazorpayCheckout, type RazorpayPaymentResponse } from "@/lib/razorpay-client";
 
 type Step = "form" | "paying" | "generating" | "done" | "error";
 
@@ -82,41 +83,34 @@ export function ReportPurchaseModal({ trigger }: { trigger?: React.ReactNode }) 
       const orderRes = await fetch("/api/payments/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: 99, name: form.name, email: form.email }),
+        body: JSON.stringify({ productType: "report", name: form.name, email: form.email || undefined }),
       });
 
       const orderData = await orderRes.json();
-      if (!orderData.success) throw new Error(orderData.error);
+      if (!orderRes.ok || !orderData.success) throw new Error(orderData.error || "Payment order could not be created.");
 
-      // Step 2: If real Razorpay keys exist, open payment widget
-      if (orderData.mode !== "development" && typeof window !== "undefined") {
-        const rzp = new (window as unknown as { Razorpay: new (opts: unknown) => { open: () => void } }).Razorpay({
+      let paymentId = orderData.orderId;
+      if (orderData.mode !== "development") {
+        const response: RazorpayPaymentResponse = await openRazorpayCheckout({
           key: orderData.keyId,
           amount: orderData.amount,
           currency: orderData.currency,
-          order_id: orderData.orderId,
-          name: "ProsperPath Numerology",
-          description: "Personal Numerology Report",
+          orderId: orderData.orderId,
+          name: "Magic of Numbers",
+          description: "Personalized Numerology Report",
           prefill: { name: form.name, email: form.email, contact: form.phone },
-          theme: { color: "#D4AF37" },
-          handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
-            // Verify payment
-            const verifyRes = await fetch("/api/payments/verify", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(response),
-            });
-            const verifyData = await verifyRes.json();
-            if (!verifyData.success) throw new Error("Payment verification failed");
-            await generateReport(dobFormatted, response.razorpay_payment_id);
-          },
         });
-        rzp.open();
-        return;
+        const verifyRes = await fetch("/api/payments/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(response),
+        });
+        const verifyData = await verifyRes.json();
+        if (!verifyRes.ok || !verifyData.success) throw new Error(verifyData.error || "Payment verification failed.");
+        paymentId = response.razorpay_payment_id;
       }
 
-      // Development: skip payment, generate directly
-      await generateReport(dobFormatted, orderData.orderId);
+      await generateReport(dobFormatted, paymentId);
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
@@ -141,7 +135,6 @@ export function ReportPurchaseModal({ trigger }: { trigger?: React.ReactNode }) 
           focusArea: form.focusArea,
           question: form.question || undefined,
           paymentId,
-          amountPaid: 99,
         }),
       });
 
@@ -227,7 +220,7 @@ export function ReportPurchaseModal({ trigger }: { trigger?: React.ReactNode }) 
                 </div>
 
                 <p className="mb-6 text-sm leading-relaxed text-lav">
-                  A 10-page PDF built from your exact date of birth and full name — your Life Path,
+                   A detailed PDF built from your exact date of birth and full name — your Life Path,
                   Expression, Soul Urge, Personal Year, 12-month forecast, lucky numbers, and
                   personalised guidance.
                 </p>
@@ -324,6 +317,7 @@ export function ReportPurchaseModal({ trigger }: { trigger?: React.ReactNode }) 
                       ))}
                     </select>
                   </div>
+                  <p className="text-xs leading-relaxed text-lav/70">Please do not include medical diagnoses, financial account details, or other highly sensitive information in your question. Numerology is reflective guidance, not professional advice.</p>
 
                   <div>
                     <Label htmlFor="rp-question">One question for your report (optional)</Label>

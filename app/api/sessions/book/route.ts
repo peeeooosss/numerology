@@ -4,6 +4,9 @@ import { db } from "@/lib/db";
 import { formatIstDate } from "@/lib/availability";
 import { getService, isServiceType, type ServiceType } from "@/lib/services";
 import { getNumerologyCoachId } from "@/lib/tenant";
+import { getVerifiedPayment, isMockPaymentsAllowed } from "@/lib/payments";
+import { getRequestAddress, rateLimit } from "@/lib/rate-limit";
+import { isValidIsoDate } from "@/lib/date-validation";
 
 export const dynamic = "force-dynamic";
 
@@ -38,9 +41,16 @@ class SlotUnavailableError extends Error {}
 
 export async function POST(req: NextRequest) {
   try {
+    const limit = rateLimit(`session-booking:${getRequestAddress(req)}`, 8, 60 * 60 * 1000);
+    if (!limit.allowed) return NextResponse.json({ success: false, error: "Please wait before trying another booking." }, { status: 429, headers: { "Retry-After": String(limit.retryAfter) } });
     const input = bookingSchema.parse(await req.json());
+    if (!isValidIsoDate(input.dateOfBirth)) return NextResponse.json({ success: false, error: "Please enter a real date of birth." }, { status: 400 });
     const serviceType: ServiceType = input.serviceType && isServiceType(input.serviceType) ? input.serviceType : "numerology";
     const service = getService(serviceType);
+    const payment = await getVerifiedPayment(input.paymentId, serviceType, service.price);
+    if (!payment && !(isMockPaymentsAllowed() && input.paymentId.startsWith("order_dev_"))) {
+      return NextResponse.json({ success: false, error: "A verified payment is required before booking" }, { status: 402 });
+    }
     const coachId = await getNumerologyCoachId();
 
     const existing = await db.session.findUnique({

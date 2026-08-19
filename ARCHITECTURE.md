@@ -88,9 +88,9 @@ Numerology/
 | Styling | Tailwind CSS 3.4 with custom design tokens (`gold`, `midnight`, `cosmic`, Playfair Display + Inter fonts) |
 | UI primitives | Radix UI (Dialog) + shadcn-style components (`components/ui/*`) |
 | Database | **PostgreSQL via Prisma 5.22** (local dev falls back to `file:./numerology.db` SQLite) |
-| Payments | **Razorpay** (order creation server-side, client-side checkout.js, HMAC-SHA256 signature verification). Dev mode returns mock orders when keys absent. |
+| Payments | **Razorpay** (server-owned prices, payment ledger, client-side checkout.js, HMAC-SHA256 signature verification, provider status checks, and webhook updates). Explicit `ALLOW_MOCK_PAYMENTS=true` is required for local-only mock flows. |
 | AI | **OpenRouter** — primary `openai/gpt-5`, fallback `google/gemini-2.5-pro`, structured JSON output via `response_format.json_schema`, token usage tracked |
-| PDF | **@react-pdf/renderer** (`serverComponentsExternalPackages`) — branded report rendered server-side to `public/reports/{id}.pdf` |
+| PDF | **@react-pdf/renderer** (`serverComponentsExternalPackages`) — branded report rendered server-side and delivered through the authenticated download API |
 | Validation | Zod 4 |
 | Charts | Recharts (admin analytics) |
 | Icons | lucide-react |

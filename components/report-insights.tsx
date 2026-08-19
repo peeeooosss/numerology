@@ -27,7 +27,7 @@ export function ReportInsights() {
         <div className="mx-auto max-w-2xl text-center">
           <p className="mb-3 text-xs uppercase tracking-[.2em] text-gold">What your numbers reveal</p>
           <h2 className="font-display text-3xl font-semibold leading-tight text-cream md:text-4xl">Your Numbers. Your Patterns. Your Possibilities.</h2>
-          <p className="mt-4 leading-relaxed text-lav">Every person has a unique numerical pattern. At ProsperPath Numerology, we use structured numerology analysis to help you understand the numbers associated with your date of birth and name.</p>
+          <p className="mt-4 leading-relaxed text-lav">Every person has a unique numerical pattern. At Magic of Numbers, we use structured numerology analysis to help you understand the numbers associated with your date of birth and name.</p>
         </div>
 
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

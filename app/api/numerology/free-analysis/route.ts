@@ -5,6 +5,8 @@ import { LIFE_PATH_INTERPRETATIONS } from "@/lib/interpretations";
 import { assembleBasicReport } from "@/lib/interpretations-loshu";
 import { calculateNameHarmony } from "@/lib/name-harmony";
 import { buildNumerologyProfile, LIFE_PATH_TITLES, PERSONAL_YEAR_THEMES } from "@/lib/numerology-engine";
+import { getRequestAddress, rateLimit } from "@/lib/rate-limit";
+import { isValidIsoDate } from "@/lib/date-validation";
 
 const schema = z.object({
   currentName: z.string().trim().min(2).max(100),
@@ -13,7 +15,10 @@ const schema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const limit = rateLimit(`free-analysis:${getRequestAddress(request)}`, 20, 60 * 60 * 1000);
+    if (!limit.allowed) return NextResponse.json({ success: false, error: "Please wait before requesting another analysis." }, { status: 429, headers: { "Retry-After": String(limit.retryAfter) } });
     const { currentName, dateOfBirth } = schema.parse(await request.json());
+    if (!isValidIsoDate(dateOfBirth)) return NextResponse.json({ success: false, error: "Please enter a real date of birth." }, { status: 400 });
     const core = buildNumerologyProfile(dateOfBirth, currentName, "blended", currentName);
     const loShu = calculateLoShuGrid(dateOfBirth, core.vedic.driver, core.vedic.conductor);
     const majorStrength = selectMajorStrength(loShu, core);

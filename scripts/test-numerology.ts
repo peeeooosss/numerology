@@ -6,7 +6,7 @@ import {
   generateMonthlyForecast,
   parseDOB,
 } from "../lib/numerology-engine";
-import { calculateLoShuGrid, selectMajorStrength } from "../lib/lo-shu";
+import { calculateLoShuGrid, LOSHU_ROWS, selectMajorStrength } from "../lib/lo-shu";
 import { assembleBasicReport } from "../lib/interpretations-loshu";
 
 function testDateParsing() {
@@ -52,6 +52,26 @@ function testLoShuReportLayer() {
   assert.equal(grid.counts[1], 2);
   assert.equal(grid.counts[4], 2);
   assert.equal(grid.counts[9], 2);
+  assert.deepEqual(LOSHU_ROWS, [
+    [4, 9, 2],
+    [3, 5, 7],
+    [8, 1, 6],
+  ]);
+  assert.deepEqual(
+    LOSHU_ROWS.map((row) => row.map((digit) => grid.counts[digit])),
+    [
+      [2, 2, 1],
+      [0, 2, 0],
+      [0, 2, 0],
+    ]
+  );
+  assert.deepEqual(grid.missing, [3, 6, 7, 8]);
+  assert.deepEqual(grid.repeated, [
+    { digit: 1, count: 2 },
+    { digit: 4, count: 2 },
+    { digit: 5, count: 2 },
+    { digit: 9, count: 2 },
+  ]);
   assert.equal(grid.missing.length, 4);
   assert.ok(grid.completedLines.some((line) => line.label === "4-9-2"));
   assert.ok(strength.label.startsWith("Completed plane"));

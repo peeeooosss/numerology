@@ -139,7 +139,10 @@ export function calculateLifePath(dob: string): { number: number; isMaster: bool
 
 /**
  * Expression Number from full birth name.
- * Blended system: 70% Pythagorean + 30% Chaldean (for Indian market)
+ * The public profile keeps Western/Pythagorean expression and Chaldean name
+ * calculations separate. The legacy "blended" option intentionally returns
+ * the Western expression number while exposing the Chaldean name number as a
+ * separate Vedic/Chaldean fact.
  */
 export function calculateExpression(
   fullName: string,

@@ -87,7 +87,7 @@ export function FreeAnalysis() {
       {!result ? <section className="mx-auto mt-10 max-w-xl rounded-3xl border border-gold/25 bg-[#101225]/90 p-6 shadow-cardglow sm:p-8">
         <p className="text-xs uppercase tracking-[.2em] text-gold">Step 1, your details</p>
         <h2 className="mt-3 font-display text-2xl text-cream">See what your numbers say</h2>
-        <form onSubmit={submit} className="mt-7 space-y-5">
+        <form onSubmit={submit} aria-busy={loading} className="mt-7 space-y-5">
           <div>
             <label htmlFor="free-current-name" className="mb-2 block text-sm font-medium text-cream">Your current name</label>
             <input id="free-current-name" required minLength={2} maxLength={100} value={currentName} onChange={(event) => setCurrentName(event.target.value)} placeholder="The name you use every day" className="h-12 w-full rounded-xl border border-gold/20 bg-white/[.04] px-4 text-base text-cream outline-none placeholder:text-lav/70 focus:border-gold focus:ring-2 focus:ring-gold/20" />
@@ -107,7 +107,7 @@ export function FreeAnalysis() {
 
 function AnalysisResult({ result, reset }: { result: AnalysisData; reset: () => void }) {
   const { core, insights, loShu } = result;
-  return <section id="free-analysis-results" className="scroll-mt-32 space-y-6">
+  return <section id="free-analysis-results" aria-live="polite" className="scroll-mt-32 space-y-6">
     <div className="rounded-3xl border border-gold/30 bg-gradient-to-br from-cosmic2 to-[#101127] p-6 shadow-cardglow sm:p-8">
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
         <div><p className="text-xs uppercase tracking-[.2em] text-gold">Your reading at a glance</p><h2 className="mt-2 font-display text-3xl text-cream">Life Path {core.lifePath} · {result.lifePathTitle}</h2><p className="mt-3 max-w-2xl leading-relaxed text-lav">{insights.summary}</p></div>
@@ -136,7 +136,7 @@ function AnalysisResult({ result, reset }: { result: AnalysisData; reset: () => 
       <InsightCard title={result.personalYearTheme} text="Your complete yearly rhythm and month-by-month focus are included in the detailed report." locked />
     </div>
 
-    <div className="rounded-3xl border border-gold/30 bg-gold/10 p-6 text-center sm:p-8"><p className="text-xs uppercase tracking-[.2em] text-gold">Want to go deeper?</p><h3 className="mt-2 font-display text-3xl text-cream">Your free result shows the pattern. The ₹99 report explains it.</h3><p className="mx-auto mt-3 max-w-2xl leading-relaxed text-lav">Unlock detailed personality, career, money, relationship, Driver and Conductor, Lo Shu, and 12-month guidance in a personalized PDF.</p><div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row"><a href="/#offer-99" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-midnight hover:bg-goldlite">Get My Detailed Report · ₹99 <ArrowRight className="h-4 w-4" /></a><a href="/#comparison" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-gold/40 px-6 py-3 text-sm font-semibold text-goldlite hover:bg-gold/10">Compare all options</a></div></div>
+     <div className="rounded-3xl border border-gold/30 bg-gold/10 p-6 text-center sm:p-8"><p className="text-xs uppercase tracking-[.2em] text-gold">Want to go deeper?</p><h3 className="mt-2 font-display text-3xl text-cream">Your free result shows the pattern. The ₹99 report explains it.</h3><p className="mx-auto mt-3 max-w-2xl leading-relaxed text-lav">Unlock detailed personality, career, money, relationship, Driver and Conductor, Lo Shu, and 12-month guidance in a personalized PDF.</p><div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row"><a href="/report" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-midnight hover:bg-goldlite">See the detailed report · ₹99 <ArrowRight className="h-4 w-4" /></a><a href="/#comparison" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-gold/40 px-6 py-3 text-sm font-semibold text-goldlite hover:bg-gold/10">Compare all options</a></div></div>
     <div className="flex justify-center"><button type="button" onClick={reset} className="min-h-11 px-4 text-sm text-lav underline-offset-4 hover:text-cream hover:underline">← Start a new analysis</button></div>
   </section>;
 }
