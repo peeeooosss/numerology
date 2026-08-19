@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getNumerologyCoachId } from "@/lib/tenant";
+import { getCurrentAdmin } from "@/lib/auth";
 
 type Context = { params: { id: string } };
 
 export async function PATCH(req: NextRequest, { params }: Context) {
   try {
+    if (!await getCurrentAdmin()) return NextResponse.json({ success: false, error: "Admin authentication required" }, { status: 401 });
     const coachId = await getNumerologyCoachId();
     const body = await req.json() as { isActive?: boolean; capacity?: number };
     const existing = await db.availabilitySlot.findFirst({ where: { id: params.id, coachId } });
@@ -20,6 +22,7 @@ export async function PATCH(req: NextRequest, { params }: Context) {
 
 export async function DELETE(_req: NextRequest, { params }: Context) {
   try {
+    if (!await getCurrentAdmin()) return NextResponse.json({ success: false, error: "Admin authentication required" }, { status: 401 });
     const coachId = await getNumerologyCoachId();
     const existing = await db.availabilitySlot.findFirst({ where: { id: params.id, coachId } });
     if (!existing) return NextResponse.json({ success: false, error: "Slot not found" }, { status: 404 });

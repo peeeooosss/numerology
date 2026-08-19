@@ -49,6 +49,7 @@ model Client {
   Enrollment       Enrollment[]
   reports          Report[]
   sessions         Session[]
+  userAccount      UserAccount?
 
   @@index([coachId, createdAt])
   @@index([coachId, email])
@@ -88,6 +89,35 @@ model Report {
   client              Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@index([clientId, createdAt])
+}
+
+model UserAccount {
+  id                  String        @id @default(cuid())
+  clientId            String        @unique
+  username            String        @unique
+  passwordHash        String
+  status              String        @default("active")
+  mustChangePassword  Boolean       @default(true)
+  lastLoginAt         DateTime?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  client              Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  authSessions        AuthSession[]
+}
+
+model AuthSession {
+  id              String       @id @default(cuid())
+  tokenHash       String       @unique
+  userAccountId   String?
+  adminUserId     String?
+  expiresAt       DateTime
+  lastUsedAt      DateTime?
+  createdAt       DateTime     @default(now())
+  userAccount     UserAccount? @relation(fields: [userAccountId], references: [id], onDelete: Cascade)
+  adminUser       AdminUser?   @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+
+  @@index([userAccountId, expiresAt])
+  @@index([adminUserId, expiresAt])
 }
 
 model Session {
@@ -190,6 +220,7 @@ model AdminUser {
   role         String  @default("master_admin")
   coachId      String?
   Coach        Coach?  @relation(fields: [coachId], references: [id])
+  authSessions AuthSession[]
 
   @@index([coachId])
 }

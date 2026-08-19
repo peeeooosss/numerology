@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDailyPrediction, checkDashboardAccess } from "@/lib/daily-predictor";
+import { getCurrentUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const clientId = searchParams.get("clientId");
-
-    if (!clientId) {
-      return NextResponse.json({ error: "clientId required" }, { status: 400 });
-    }
+    const currentUser = await getCurrentUser();
+    if (!currentUser) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    const clientId = currentUser.client.id;
 
     // Verify dashboard access
     const hasAccess = await checkDashboardAccess(clientId);

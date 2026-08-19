@@ -1,149 +1,35 @@
 "use client";
 
-import { ClipboardEvent, FormEvent, KeyboardEvent, useState } from "react";
-import { ArrowLeft, KeyRound, LockKeyhole, Mail, ShieldCheck, Sparkles } from "lucide-react";
+import { FormEvent, useState } from "react";
+import { KeyRound, LockKeyhole, Mail, ShieldCheck, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const DEMO_USER_EMAIL = "demo@aura-numerology.com";
-const DEMO_USER_OTP = "123456";
-
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState(["", "", "", "", "", ""]);
-  const [step, setStep] = useState<"email" | "otp">("email");
-  const [message, setMessage] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function useDemoAccount() {
-    setEmail(DEMO_USER_EMAIL);
-    setError("");
-    setMessage("Demo account selected. Use OTP 123456 to continue.");
-    setStep("otp");
-  }
-
-  function sendCode(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setLoading(true);
     setError("");
-    if (!email.trim()) return;
-    setStep("otp");
-    setMessage(
-      email.trim().toLowerCase() === DEMO_USER_EMAIL
-        ? "Demo OTP: 123456"
-        : `Test verification code sent to ${email}. Use 123456 in this demo build.`
-    );
-  }
-
-  function updateCode(index: number, value: string) {
-    const digits = value.replace(/\D/g, "");
-    if (!digits) {
-      setCode((current) => current.map((item, itemIndex) => (itemIndex === index ? "" : item)));
-      return;
+    try {
+      const response = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password }) });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.error || "Sign in failed.");
+      router.replace("/dashboard");
+    } catch (loginError) {
+      setError(loginError instanceof Error ? loginError.message : "Sign in failed.");
+    } finally {
+      setLoading(false);
     }
-
-    setCode((current) => {
-      const next = [...current];
-      digits.slice(0, 6 - index).split("").forEach((digit, offset) => { next[index + offset] = digit; });
-      return next;
-    });
-    const nextIndex = Math.min(index + digits.length, 5);
-    window.setTimeout(() => document.getElementById(`otp-${nextIndex}`)?.focus(), 0);
   }
 
-  function handleCodeKeyDown(index: number, event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === "Backspace" && !code[index] && index > 0) {
-      event.preventDefault();
-      setCode((current) => current.map((item, itemIndex) => (itemIndex === index - 1 ? "" : item)));
-      document.getElementById(`otp-${index - 1}`)?.focus();
-    }
-    if (event.key === "ArrowLeft" && index > 0) document.getElementById(`otp-${index - 1}`)?.focus();
-    if (event.key === "ArrowRight" && index < 5) document.getElementById(`otp-${index + 1}`)?.focus();
-  }
-
-  function handleCodePaste(index: number, event: ClipboardEvent<HTMLInputElement>) {
-    const pasted = event.clipboardData.getData("text").replace(/\D/g, "");
-    if (!pasted) return;
-    event.preventDefault();
-    updateCode(index, pasted);
-  }
-
-  function verifyCode(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError("");
-    if (email.trim().toLowerCase() !== DEMO_USER_EMAIL || code.join("") !== DEMO_USER_OTP) {
-      setError(`Use the demo credentials: ${DEMO_USER_EMAIL} with OTP ${DEMO_USER_OTP}.`);
-      return;
-    }
-
-    window.localStorage.setItem("aura_user_authenticated", "true");
-    window.localStorage.setItem("aura_user_email", DEMO_USER_EMAIL);
-    router.replace("/dashboard");
-  }
-
-  return (
-    <main className="relative flex min-h-screen-dynamic items-center justify-center overflow-hidden bg-cosmic-field px-5 py-10 text-cream">
-      <div className="pointer-events-none absolute -right-20 top-10 h-72 w-72 rounded-full bg-gold/10 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-copper/10 blur-3xl" />
-      <Card className="relative w-full max-w-md border-gold/25 bg-[#101225]/90 p-2">
-        <CardHeader className="px-6 pt-8 text-center">
-          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-gold/40 bg-gold/10 text-gold shadow-goldglow">
-            <Sparkles className="h-7 w-7" />
-          </div>
-          <p className="text-xs uppercase tracking-[.24em] text-gold">AURA private access</p>
-          <CardTitle className="mt-3 text-3xl">{step === "email" ? "Enter your portal" : "Enter demo OTP"}</CardTitle>
-          <CardDescription className="mx-auto mt-2 max-w-xs">
-            {step === "email" ? "Use the demo account below to open the personalised dashboard." : "Verify the six-digit demo code to unlock your dashboard."}
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent className="px-6 pb-8 pt-5">
-          {step === "email" ? (
-            <form onSubmit={sendCode} className="space-y-5">
-              <div>
-                <Label htmlFor="email">Email address</Label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gold" />
-                  <Input id="email" type="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder={DEMO_USER_EMAIL} className="pl-11" />
-                </div>
-              </div>
-              <Button type="submit" className="w-full">Send demo code <KeyRound className="h-4 w-4" /></Button>
-              <Button type="button" variant="outline" className="w-full" onClick={useDemoAccount}>Use demo account</Button>
-            </form>
-          ) : (
-            <form onSubmit={verifyCode} className="space-y-6">
-              <div className="rounded-xl border border-gold/20 bg-gold/5 p-3 text-center text-sm">
-                <p className="text-lav">Demo account</p>
-                <p className="mt-1 text-gold">{DEMO_USER_EMAIL}</p>
-                <p className="mt-2 text-xs text-lav">OTP: <span className="font-mono text-cream">123456</span></p>
-              </div>
-               <div className="mx-auto flex w-full max-w-sm justify-center gap-2">
-                 {code.map((digit, index) => (
-                   <input key={index} id={`otp-${index}`} aria-label={`Verification digit ${index + 1}`} inputMode="numeric" pattern="[0-9]*" maxLength={1} autoFocus={index === 0} autoComplete={index === 0 ? "one-time-code" : "off"} value={digit} onChange={(event) => updateCode(index, event.target.value)} onKeyDown={(event) => handleCodeKeyDown(index, event)} onPaste={(event) => handleCodePaste(index, event)} className="h-12 min-w-0 flex-1 rounded-lg border border-gold/25 bg-midnight text-center text-lg text-cream outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 sm:max-w-12" />
-                 ))}
-               </div>
-              {message && <p className="text-center text-sm text-goldlite">{message}</p>}
-              {error && <p role="alert" className="text-center text-sm text-rose-300">{error}</p>}
-              <Button type="submit" className="w-full">Open demo dashboard <ShieldCheck className="h-4 w-4" /></Button>
-               <button type="button" onClick={() => { setStep("email"); setCode(["", "", "", "", "", ""]); setError(""); }} className="mx-auto flex min-h-11 items-center gap-2 px-3 text-sm text-lav hover:text-cream"><ArrowLeft className="h-3.5 w-3.5" /> Use another email</button>
-            </form>
-          )}
-
-          {step === "email" && (
-            <div className="mt-7 rounded-xl border border-white/10 bg-white/[.03] p-4 text-center">
-              <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-widest text-gold"><LockKeyhole className="h-3.5 w-3.5" /> Demo credentials</div>
-              <p className="mt-3 text-xs text-lav">Email</p>
-              <p className="mt-1 font-mono text-sm text-cream">{DEMO_USER_EMAIL}</p>
-              <p className="mt-3 text-xs text-lav">OTP</p>
-              <p className="mt-1 font-mono text-sm text-cream">{DEMO_USER_OTP}</p>
-               <p className="mt-3 text-xs text-lav">Development-only access. No email is sent.</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </main>
-  );
+  return <main className="relative flex min-h-screen-dynamic items-center justify-center overflow-hidden bg-cosmic-field px-5 py-10 text-cream"><div className="pointer-events-none absolute -right-20 top-10 h-72 w-72 rounded-full bg-gold/10 blur-3xl" /><div className="pointer-events-none absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-copper/10 blur-3xl" /><Card className="relative w-full max-w-md border-gold/25 bg-[#101225]/90 p-2"><CardHeader className="px-6 pt-8 text-center"><div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-gold/40 bg-gold/10 text-gold shadow-goldglow"><Sparkles className="h-7 w-7" /></div><p className="text-xs uppercase tracking-[.24em] text-gold">Magic of Numbers dashboard</p><CardTitle className="mt-3 text-3xl">Sign in to your dashboard</CardTitle><CardDescription className="mx-auto mt-2 max-w-xs">Use the username and temporary password shared by the admin.</CardDescription></CardHeader><CardContent className="px-6 pb-8 pt-5"><form onSubmit={handleSubmit} className="space-y-5"><div><Label htmlFor="username">Username or email</Label><div className="relative"><Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gold" /><Input id="username" required autoComplete="username" value={username} onChange={(event) => setUsername(event.target.value)} placeholder="you@example.com" className="pl-11" /></div></div><div><Label htmlFor="password">Password</Label><div className="relative"><KeyRound className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gold" /><Input id="password" required type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Your temporary password" className="pl-11" /></div></div>{error && <p role="alert" className="text-sm text-rose-300">{error}</p>}<Button type="submit" disabled={loading} className="w-full">{loading ? "Signing in…" : "Open my dashboard"} <ShieldCheck className="h-4 w-4" /></Button></form><div className="mt-7 rounded-xl border border-white/10 bg-white/[.03] p-4 text-center"><div className="flex items-center justify-center gap-2 text-xs uppercase tracking-widest text-gold"><LockKeyhole className="h-3.5 w-3.5" />Private access</div><p className="mt-3 text-sm leading-relaxed text-lav">Your dashboard credentials are created by the Magic of Numbers admin after your session booking.</p></div></CardContent></Card></main>;
 }

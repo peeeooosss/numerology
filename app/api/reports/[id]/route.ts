@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getReport } from "@/lib/report-service";
+import { getCurrentAdmin, getCurrentUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,8 @@ export async function GET(
     if (!report) {
       return NextResponse.json({ error: "Report not found" }, { status: 404 });
     }
+    const [admin, user] = await Promise.all([getCurrentAdmin(), getCurrentUser()]);
+    if (!admin && (!user || user.client.id !== report.clientId)) return NextResponse.json({ error: "Report access denied" }, { status: 403 });
     return NextResponse.json({
       success: true,
       report: {

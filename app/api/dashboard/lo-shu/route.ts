@@ -5,23 +5,18 @@ import { checkDashboardAccess } from "@/lib/daily-predictor";
 import { buildNumerologyProfile } from "@/lib/numerology-engine";
 import { calculateLoShuGrid, LOSHU_ROWS, selectMajorStrength } from "@/lib/lo-shu";
 import { LOSHU_MISSING_DETAILS } from "@/lib/interpretations-loshu";
+import { getCurrentUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const clientId = searchParams.get("clientId");
-    const email = searchParams.get("email");
-
-    if (!clientId && !email) {
-      return NextResponse.json({ error: "clientId or email required" }, { status: 400 });
-    }
+    const currentUser = await getCurrentUser();
+    if (!currentUser) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    const clientId = currentUser.client.id;
 
     const coachId = await getNumerologyCoachId();
-    const client = clientId
-      ? await db.client.findFirst({ where: { id: clientId, coachId } })
-      : await db.client.findFirst({ where: { email: email ?? undefined, coachId }, orderBy: { createdAt: "desc" } });
+    const client = await db.client.findFirst({ where: { id: clientId, coachId } });
 
     if (!client) return NextResponse.json({ error: "Client not found" }, { status: 404 });
 

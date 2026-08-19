@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { getNumerologyCoachId } from "@/lib/tenant";
+import { getCurrentAdmin } from "@/lib/auth";
 
 const statusSchema = z.object({
   status: z.enum(["booked", "completed", "cancelled"]).optional(),
@@ -12,6 +13,7 @@ const statusSchema = z.object({
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   try {
+    if (!await getCurrentAdmin()) return NextResponse.json({ success: false, error: "Admin authentication required" }, { status: 401 });
     const input = statusSchema.parse(await req.json());
     const coachId = await getNumerologyCoachId();
     if (!input.status && input.notes === undefined && input.adminAnalysisJson === undefined) throw new Error("No session changes provided");

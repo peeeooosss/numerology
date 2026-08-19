@@ -5,8 +5,6 @@ import { ArrowLeft, LockKeyhole, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-const DEMO_EMAIL = "demo@aura-numerology.com";
-
 type Blueprint = {
   client: { name: string; dateOfBirth: string };
   driver: number;
@@ -25,8 +23,7 @@ export default function LoShuBlueprintPage() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const email = window.localStorage.getItem("aura_user_email") || DEMO_EMAIL;
-    fetch(`/api/dashboard/lo-shu?email=${encodeURIComponent(email)}`, { cache: "no-store" })
+    fetch("/api/dashboard/lo-shu", { cache: "no-store" })
       .then(async (response) => {
         const data = await response.json() as Blueprint & { error?: string };
         if (response.status === 403) {

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { ensureDefaultAvailability, formatIstTimeRange, PRACTICE_TIMEZONE } from "@/lib/availability";
 import { getNumerologyCoachId } from "@/lib/tenant";
+import { getCurrentAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -45,6 +46,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    if (!await getCurrentAdmin()) return NextResponse.json({ success: false, error: "Admin authentication required" }, { status: 401 });
     const input = createSlotSchema.parse(await req.json());
     const coachId = await getNumerologyCoachId();
     const startsAt = new Date(input.startsAt);

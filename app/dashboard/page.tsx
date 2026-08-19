@@ -28,6 +28,8 @@ import {
 } from "@/lib/numerology-engine";
 import { PERSONAL_DAY_GUIDANCE } from "@/lib/interpretations";
 import { getService } from "@/lib/services";
+import { useRouter } from "next/navigation";
+import { ChangePasswordForm } from "@/components/change-password-form";
 
 const resources = [
   { title: "Your Life Path, decoded", type: "8 min watch", locked: false, color: "from-copper/70 to-[#27244f]" },
@@ -35,14 +37,6 @@ const resources = [
   { title: "Compatibility & connection", type: "Premium lesson", locked: true, color: "from-[#513252] to-[#171a3c]" },
   { title: "Your personal year ahead", type: "Premium lesson", locked: true, color: "from-[#263e54] to-[#171a3c]" },
 ];
-
-// Demo client (in production this comes from session/auth)
-const DEMO_CLIENT = {
-  name: "Aarav Mehta",
-  dob: "14 May 1992",
-  fullBirthName: "Aarav Rajesh Mehta",
-  email: "demo@aura-numerology.com",
-};
 
 type DashboardSession = {
   id: string;
@@ -67,7 +61,7 @@ function formatSessionDate(scheduledAt: string, createdAt: string, slotStart?: s
   return Number.isNaN(value.getTime()) ? scheduledAt : new Intl.DateTimeFormat("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" }).format(value) + " IST";
 }
 
-function Sidebar({ open, close }: { open: boolean; close: () => void }) {
+function Sidebar({ open, close, logout }: { open: boolean; close: () => void; logout: () => void }) {
   return (
     <aside
       className={`fixed inset-y-0 left-0 z-40 w-72 border-r border-gold/10 bg-[#0d0f20] p-5 transition-transform lg:static lg:flex lg:w-64 lg:shrink-0 lg:translate-x-0 ${
@@ -107,7 +101,7 @@ function Sidebar({ open, close }: { open: boolean; close: () => void }) {
           ))}
         </div>
         <div className="mt-auto border-t border-white/10 pt-5">
-          <button className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-lav transition hover:bg-white/5 hover:text-cream">
+          <button onClick={logout} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-lav transition hover:bg-white/5 hover:text-cream">
             <ArrowUpRight className="h-4 w-4" />
             Logout
           </button>
@@ -118,7 +112,10 @@ function Sidebar({ open, close }: { open: boolean; close: () => void }) {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [client, setClient] = useState<{ name: string; dateOfBirth: string; fullBirthName?: string | null; email?: string | null } | null>(null);
+  const [mustChangePassword, setMustChangePassword] = useState(false);
   const [profile, setProfile] = useState<ReturnType<typeof buildNumerologyProfile> | null>(null);
   const [dailyGuidance, setDailyGuidance] = useState<{
     theme: string;
@@ -134,37 +131,28 @@ export default function DashboardPage() {
   const [reportDownloadUrl, setReportDownloadUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    // Build real numerology profile from demo client data
-    const core = buildNumerologyProfile(DEMO_CLIENT.dob, DEMO_CLIENT.fullBirthName, "blended");
-    setProfile(core);
-
-    // Build daily guidance from personal day number
-    const guidance = PERSONAL_DAY_GUIDANCE[core.personalDay] ?? PERSONAL_DAY_GUIDANCE[1];
-
-    // Calculate energy score locally
-    const lifePathReduced = core.lifePath > 9 ? (core.lifePath === 11 ? 2 : core.lifePath === 22 ? 4 : 6) : core.lifePath;
-    let score = 60;
-    if (core.personalDay === lifePathReduced) score += 20;
-    if (core.personalDay === core.personalYear) score += 10;
-    if (core.personalDay === 1 || core.personalDay === 8) score += 8;
-    if (core.personalDay === 7) score -= 15;
-    score = Math.max(40, Math.min(100, score));
-
-    setDailyGuidance({
-      theme: guidance.theme,
-      prediction: guidance.prediction,
-      dos: guidance.dos,
-      donts: guidance.donts,
-      energyScore: score,
-      luckyNumbers: core.luckyNumbers,
-      personalDay: core.personalDay,
-    });
-  }, []);
+    fetch("/api/auth/me", { cache: "no-store" }).then(async (response) => {
+      if (!response.ok) { router.replace("/login"); return; }
+      const data = await response.json() as { user: { mustChangePassword: boolean }; client: { name: string; dateOfBirth: string; fullBirthName?: string | null; email?: string | null } };
+      setClient(data.client);
+      setMustChangePassword(data.user.mustChangePassword);
+      const core = buildNumerologyProfile(data.client.dateOfBirth, data.client.fullBirthName || data.client.name, "blended");
+      setProfile(core);
+      const guidance = PERSONAL_DAY_GUIDANCE[core.personalDay] ?? PERSONAL_DAY_GUIDANCE[1];
+      const lifePathReduced = core.lifePath > 9 ? (core.lifePath === 11 ? 2 : core.lifePath === 22 ? 4 : 6) : core.lifePath;
+      let score = 60;
+      if (core.personalDay === lifePathReduced) score += 20;
+      if (core.personalDay === core.personalYear) score += 10;
+      if (core.personalDay === 1 || core.personalDay === 8) score += 8;
+      if (core.personalDay === 7) score -= 15;
+      score = Math.max(40, Math.min(100, score));
+      setDailyGuidance({ theme: guidance.theme, prediction: guidance.prediction, dos: guidance.dos, donts: guidance.donts, energyScore: score, luckyNumbers: core.luckyNumbers, personalDay: core.personalDay });
+    }).catch(() => router.replace("/login"));
+  }, [router]);
 
   async function refreshSessions() {
     try {
-      const email = window.localStorage.getItem("aura_user_email") || DEMO_CLIENT.email;
-      const response = await fetch(`/api/sessions?email=${encodeURIComponent(email)}`, { cache: "no-store" });
+      const response = await fetch("/api/sessions", { cache: "no-store" });
       const data = await response.json();
       if (response.ok && data.success) {
         setSessionHistory(data.sessions as DashboardSession[]);
@@ -187,14 +175,14 @@ export default function DashboardPage() {
     year: "numeric",
   });
 
-  const firstName = DEMO_CLIENT.name.split(" ")[0];
+  const firstName = client?.name.split(" ")[0] ?? "there";
   const lpTitle = profile ? (LIFE_PATH_TITLES[profile.lifePath] ?? "Your Path") : "…";
   const pyTheme = profile ? (PERSONAL_YEAR_THEMES[profile.personalYear] ?? "") : "";
 
   return (
     <main className="min-h-screen-dynamic bg-cosmic-field text-cream">
       <div className="min-h-screen-dynamic flex">
-        <Sidebar open={menuOpen} close={() => setMenuOpen(false)} />
+        <Sidebar open={menuOpen} close={() => setMenuOpen(false)} logout={() => { void fetch("/api/auth/logout", { method: "POST" }).finally(() => router.replace("/login")); }} />
         {menuOpen && (
           <button
             className="fixed inset-0 z-30 bg-midnight/70 lg:hidden"
@@ -215,20 +203,20 @@ export default function DashboardPage() {
             </button>
             <div className="ml-auto flex items-center gap-3">
               <span className="hidden text-right sm:block">
-                <span className="block text-sm font-medium">{DEMO_CLIENT.name}</span>
+                 <span className="block text-sm font-medium">{client?.name ?? "Your dashboard"}</span>
                 <span className="text-xs text-lav">
                   Life Path {profile?.lifePath ?? "…"} · {lpTitle}
                 </span>
               </span>
               <div className="flex h-10 w-10 items-center justify-center rounded-full border border-gold/40 bg-gold/10 font-display text-gold">
-                {DEMO_CLIENT.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                 {(client?.name ?? "MN").split(" ").map((n) => n[0]).join("").slice(0, 2)}
               </div>
             </div>
           </header>
 
           <div className="mx-auto max-w-7xl space-y-8 px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
             {/* Welcome */}
-            <div>
+             <div>
               <p className="text-sm text-gold">{today}</p>
               <h1 className="mt-2 font-display text-3xl text-cream md:text-4xl">
                 Welcome back, {firstName}
@@ -237,9 +225,11 @@ export default function DashboardPage() {
                 Personal Day {profile?.personalDay ?? "…"} ·{" "}
                 {dailyGuidance?.theme ?? "Calculating your numbers…"}
               </p>
-            </div>
+             </div>
 
-            {/* Daily AURA Card */}
+             {mustChangePassword && <ChangePasswordForm onChanged={() => setMustChangePassword(false)} />}
+
+             {/* Daily AURA Card */}
             <Card className="glass overflow-hidden border-gold/25">
               <CardContent className="p-6 md:p-8">
                 <div className="flex flex-col justify-between gap-6 md:flex-row md:items-start">
